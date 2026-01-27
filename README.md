@@ -113,7 +113,7 @@ Want to see the tool in action? Try **Demo Mode**:
 
 <p align="center">
   <img src="Images/Export.png" width="45%" />
-  <img src="Images/Analyze.png" width="45%" />
+  <img src="Images/analyze.png" width="45%" />
 </p>
 
 </div>
