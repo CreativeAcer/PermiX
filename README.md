@@ -106,7 +106,15 @@ Want to see the tool in action? Try **Demo Mode**:
 
 <div align="center">
 
-### will be updated
+<p align="center">
+  <img src="Images/main.png" width="45%" />
+  <img src="Images/Dashboard.png" width="45%" />
+</p>
+
+<p align="center">
+  <img src="Images/Export.png" width="45%" />
+  <img src="Images/Analyze.png" width="45%" />
+</p>
 
 </div>
 
