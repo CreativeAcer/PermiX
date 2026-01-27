@@ -1,4 +1,4 @@
-﻿# 🔐 SharePoint Online Permissions Report Tool
+﻿# 🔐 SharePoint Online Permissions Report Tool  [![CodeFactor](https://www.codefactor.io/repository/github/creativeacer/spo-permissions-analyzer/badge)](https://www.codefactor.io/repository/github/creativeacer/spo-permissions-analyzer)
 
 <div align="center">
 
