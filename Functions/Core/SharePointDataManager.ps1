@@ -6,13 +6,13 @@
 
 # Global data storage
 $script:SharePointData = @{
-    Sites = @()
-    Users = @()
-    Groups = @()
-    Permissions = @()
-    RoleAssignments = @()
-    InheritanceItems = @()
-    SharingLinks = @()
+    Sites = [System.Collections.ArrayList]::new()
+    Users = [System.Collections.ArrayList]::new()
+    Groups = [System.Collections.ArrayList]::new()
+    Permissions = [System.Collections.ArrayList]::new()
+    RoleAssignments = [System.Collections.ArrayList]::new()
+    InheritanceItems = [System.Collections.ArrayList]::new()
+    SharingLinks = [System.Collections.ArrayList]::new()
     LastOperation = ""
     LastUpdateTime = $null
     OperationMetrics = @{
@@ -34,13 +34,13 @@ function Initialize-SharePointDataManager {
     Initializes the SharePoint data manager
     #>
     $script:SharePointData = @{
-        Sites = @()
-        Users = @()
-        Groups = @()
-        Permissions = @()
-        RoleAssignments = @()
-        InheritanceItems = @()
-        SharingLinks = @()
+        Sites = [System.Collections.ArrayList]::new()
+        Users = [System.Collections.ArrayList]::new()
+        Groups = [System.Collections.ArrayList]::new()
+        Permissions = [System.Collections.ArrayList]::new()
+        RoleAssignments = [System.Collections.ArrayList]::new()
+        InheritanceItems = [System.Collections.ArrayList]::new()
+        SharingLinks = [System.Collections.ArrayList]::new()
         LastOperation = ""
         LastUpdateTime = $null
         OperationMetrics = @{
@@ -92,7 +92,7 @@ function Add-SharePointSite {
         }
     }
     
-    $script:SharePointData.Sites += $SiteData
+    [void]$script:SharePointData.Sites.Add($SiteData)
     $script:SharePointData.OperationMetrics.TotalSites = $script:SharePointData.Sites.Count
     
     Write-ActivityLog "Added site: $($SiteData['Title'])" -Level "Information"
@@ -114,7 +114,7 @@ function Add-SharePointUser {
     if (-not $UserData.ContainsKey("Type")) { $UserData["Type"] = "Internal" }
     if (-not $UserData.ContainsKey("Permission")) { $UserData["Permission"] = "Read" }
     
-    $script:SharePointData.Users += $UserData
+    [void]$script:SharePointData.Users.Add($UserData)
     $script:SharePointData.OperationMetrics.TotalUsers = $script:SharePointData.Users.Count
     
     # Count external users
@@ -140,7 +140,7 @@ function Add-SharePointGroup {
     if (-not $GroupData.ContainsKey("MemberCount")) { $GroupData["MemberCount"] = 0 }
     if (-not $GroupData.ContainsKey("Permission")) { $GroupData["Permission"] = "Read" }
     
-    $script:SharePointData.Groups += $GroupData
+    [void]$script:SharePointData.Groups.Add($GroupData)
     $script:SharePointData.OperationMetrics.TotalGroups = $script:SharePointData.Groups.Count
     
     Write-ActivityLog "Added group: $($GroupData['Name'])" -Level "Information"
@@ -162,7 +162,7 @@ function Add-SharePointRoleAssignment {
     if (-not $RoleData.ContainsKey("Scope")) { $RoleData["Scope"] = "Site" }
     if (-not $RoleData.ContainsKey("ScopeUrl")) { $RoleData["ScopeUrl"] = "N/A" }
 
-    $script:SharePointData.RoleAssignments += $RoleData
+    [void]$script:SharePointData.RoleAssignments.Add($RoleData)
     $script:SharePointData.OperationMetrics.TotalRoleAssignments = $script:SharePointData.RoleAssignments.Count
 }
 
@@ -181,7 +181,7 @@ function Add-SharePointInheritanceItem {
     if (-not $InheritanceData.ContainsKey("Type")) { $InheritanceData["Type"] = "Unknown" }
     if (-not $InheritanceData.ContainsKey("HasUniquePermissions")) { $InheritanceData["HasUniquePermissions"] = $false }
 
-    $script:SharePointData.InheritanceItems += $InheritanceData
+    [void]$script:SharePointData.InheritanceItems.Add($InheritanceData)
     if ($InheritanceData["HasUniquePermissions"] -eq $true) {
         $script:SharePointData.OperationMetrics.InheritanceBreaks++
     }
@@ -202,7 +202,7 @@ function Add-SharePointSharingLink {
     if (-not $LinkData.ContainsKey("AccessLevel")) { $LinkData["AccessLevel"] = "Unknown" }
     if (-not $LinkData.ContainsKey("MemberCount")) { $LinkData["MemberCount"] = 0 }
 
-    $script:SharePointData.SharingLinks += $LinkData
+    [void]$script:SharePointData.SharingLinks.Add($LinkData)
     $script:SharePointData.OperationMetrics.TotalSharingLinks = $script:SharePointData.SharingLinks.Count
 }
 
@@ -217,28 +217,28 @@ function Clear-SharePointData {
 
     switch ($DataType) {
         "Sites" {
-            $script:SharePointData.Sites = @()
+            $script:SharePointData.Sites.Clear()
             $script:SharePointData.OperationMetrics.TotalSites = 0
         }
         "Users" {
-            $script:SharePointData.Users = @()
+            $script:SharePointData.Users.Clear()
             $script:SharePointData.OperationMetrics.TotalUsers = 0
             $script:SharePointData.OperationMetrics.ExternalUsers = 0
         }
         "Groups" {
-            $script:SharePointData.Groups = @()
+            $script:SharePointData.Groups.Clear()
             $script:SharePointData.OperationMetrics.TotalGroups = 0
         }
         "RoleAssignments" {
-            $script:SharePointData.RoleAssignments = @()
+            $script:SharePointData.RoleAssignments.Clear()
             $script:SharePointData.OperationMetrics.TotalRoleAssignments = 0
         }
         "InheritanceItems" {
-            $script:SharePointData.InheritanceItems = @()
+            $script:SharePointData.InheritanceItems.Clear()
             $script:SharePointData.OperationMetrics.InheritanceBreaks = 0
         }
         "SharingLinks" {
-            $script:SharePointData.SharingLinks = @()
+            $script:SharePointData.SharingLinks.Clear()
             $script:SharePointData.OperationMetrics.TotalSharingLinks = 0
         }
         "All" {
