@@ -12,7 +12,9 @@
 #>
 
 param(
-    [int]$Port = 8080
+    [int]$Port = 8080,
+    [string]$ListenAddress = "localhost",
+    [switch]$NoBrowser
 )
 
 # ============================================
@@ -67,4 +69,4 @@ $script:DemoMode = $false
 Initialize-SharePointDataManager
 
 # Start the web server (blocks until Ctrl+C)
-Start-WebServer -Port $Port
+Start-WebServer -Port $Port -ListenAddress $ListenAddress -NoBrowser:$NoBrowser

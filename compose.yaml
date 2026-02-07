@@ -1,0 +1,27 @@
+# ============================================
+# SPO Permissions Analyzer - Compose File
+# ============================================
+#
+# Usage:
+#   podman compose up              → Web UI at http://localhost:8080 (default)
+#   podman compose --profile local up  → WPF/XAML mode (Windows container only)
+#
+# Also works with docker compose.
+
+services:
+  spo-web:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - UI_MODE=web
+    restart: unless-stopped
+
+  spo-local:
+    build: .
+    profiles:
+      - local
+    environment:
+      - UI_MODE=local
+    # WPF mode requires Windows container with display access.
+    # On Linux containers this will exit with instructions.
