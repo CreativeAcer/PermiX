@@ -33,6 +33,7 @@ function Invoke-ApiHandler {
             $exportType = $Path.Replace("/api/export/", "")
             Handle-PostExport -Request $Request -Response $Response -ExportType $exportType
         }
+        "/api/audit"        { Handle-GetAudit -Response $Response }
         "/api/shutdown"     {
             Send-JsonResponse -Response $Response -Data @{ success = $true; message = "Shutting down" }
             Stop-WebServer
@@ -395,6 +396,37 @@ function Handle-GetMetrics {
         totalRoleAssignments = $metrics.TotalRoleAssignments
         inheritanceBreaks = $metrics.InheritanceBreaks
         totalSharingLinks = $metrics.TotalSharingLinks
+    }
+}
+
+# ---- Audit ----
+
+function Handle-GetAudit {
+    param($Response)
+
+    $session = Get-AuditSession
+    if (-not $session) {
+        Send-JsonResponse -Response $Response -Data @{
+            hasSession = $false
+            message = "No audit session available"
+        }
+        return
+    }
+
+    Send-JsonResponse -Response $Response -Data @{
+        hasSession    = $true
+        sessionId     = $session.SessionId
+        operationType = $session.OperationType
+        status        = $session.Status
+        startTime     = $session.StartTimestamp
+        endTime       = $session.EndTimestamp
+        duration      = $session.Duration
+        scanScope     = $session.ScanScope
+        userPrincipal = $session.UserPrincipal
+        errorCount    = $session.ErrorCount
+        eventCount    = $session.Events.Count
+        outputFiles   = @($session.OutputFiles)
+        metrics       = $session.Metrics
     }
 }
 

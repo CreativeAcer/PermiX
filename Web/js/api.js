@@ -54,6 +54,10 @@ const API = {
         return this.get('metrics');
     },
 
+    getAudit() {
+        return this.get('audit');
+    },
+
     exportData(type) {
         // Returns a download, not JSON
         window.open(`/api/export/${type}`, '_blank');

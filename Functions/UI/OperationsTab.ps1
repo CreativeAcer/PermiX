@@ -64,6 +64,9 @@ function Get-RealSites-DataDriven {
         Clear-SharePointData -DataType "Sites"
         Set-SharePointOperationContext -OperationType "Sites Analysis"
 
+        # Start audit session
+        Start-AuditSession -OperationType "SitesAnalysis" -ScanScope "Tenant"
+
         # Clear console and show header
         Write-ConsoleOutput "🔍 SHAREPOINT SITES ANALYSIS" -ForceUpdate
         Write-ConsoleOutput "=====================================================" -Append -ForceUpdate
@@ -254,10 +257,14 @@ function Get-RealSites-DataDriven {
         Update-VisualAnalyticsFromData
 
         Write-ActivityLog "Sites operation completed with $($sites.Count) sites" -Level "Information"
+        Write-AuditEvent -EventType "DataCollection" -Detail "Sites analysis complete: $($sites.Count) sites"
+        Complete-AuditSession -Status "Completed"
 
     }
     catch {
         Write-ErrorLog -Message $_.Exception.Message -Location "Get-RealSites-DataDriven"
+        Write-AuditEvent -EventType "Error" -Detail $_.Exception.Message
+        Complete-AuditSession -Status "Failed"
         Write-ConsoleOutput "" -Append
         Write-ConsoleOutput "❌ ERROR: Site enumeration failed" -Append
         Write-ConsoleOutput "Error Details: $($_.Exception.Message)" -Append
@@ -283,6 +290,9 @@ function Get-RealPermissions-DataDriven {
         # Clear previous data and set context
         Clear-SharePointData -DataType "All"
         Set-SharePointOperationContext -OperationType "Permissions Analysis"
+
+        # Start audit session
+        Start-AuditSession -OperationType "PermissionsAnalysis" -ScanScope $siteUrl
 
         # Clear console and show header
         Write-ConsoleOutput "🔐 SHAREPOINT PERMISSIONS ANALYSIS" -ForceUpdate
@@ -686,10 +696,14 @@ function Get-RealPermissions-DataDriven {
         Update-VisualAnalyticsFromData
 
         Write-ActivityLog "Permissions analysis completed with storage: $storageValue MB" -Level "Information"
+        Write-AuditEvent -EventType "DataCollection" -Detail "Permissions analysis complete" -AffectedObject $siteUrl
+        Complete-AuditSession -Status "Completed"
 
     }
     catch {
         Write-ErrorLog -Message $_.Exception.Message -Location "Get-RealPermissions-DataDriven"
+        Write-AuditEvent -EventType "Error" -Detail $_.Exception.Message
+        Complete-AuditSession -Status "Failed"
         Write-ConsoleOutput "❌ ERROR: Permissions analysis failed" -Append
         Write-ConsoleOutput "Error Details: $($_.Exception.Message)" -Append
     }
