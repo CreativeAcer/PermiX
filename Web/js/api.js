@@ -66,6 +66,10 @@ const API = {
         return this.get('risk');
     },
 
+    getAudit() {
+        return this.get('audit');
+    },
+
     exportData(type) {
         // Returns a download, not JSON
         window.open(`/api/export/${type}`, '_blank');

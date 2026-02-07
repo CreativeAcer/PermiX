@@ -18,6 +18,7 @@ Add-Type -AssemblyName System.Windows.Forms
 . "$PSScriptRoot\Functions\Core\JsonExport.ps1"
 . "$PSScriptRoot\Functions\Core\GraphEnrichment.ps1"
 . "$PSScriptRoot\Functions\Core\RiskScoring.ps1"
+. "$PSScriptRoot\Functions\Core\AuditLog.ps1"
 . "$PSScriptRoot\Functions\UI\UIManager.ps1"
 . "$PSScriptRoot\Functions\SharePoint\SPOConnection.ps1"
 . "$PSScriptRoot\Functions\UI\ConnectionTab.ps1"

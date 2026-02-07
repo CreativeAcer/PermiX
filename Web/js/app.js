@@ -147,6 +147,7 @@ async function handleGetSites() {
                 console_.textContent += `\n${i + 1}. ${s.Title || 'Unknown'}\n   URL: ${s.Url || 'N/A'}\n   Owner: ${s.Owner || 'N/A'}\n   Storage: ${s.Storage || '0'} MB\n`;
             });
             await refreshAnalytics();
+            await showAuditSummary(console_);
             toast(`Retrieved ${siteList.length} sites`, 'success');
         } else {
             console_.textContent += `\nError: ${res.message}`;
@@ -181,6 +182,7 @@ async function handleAnalyze() {
             console_.textContent += `\nRole Assignments: ${metrics.totalRoleAssignments} | Inheritance Breaks: ${metrics.inheritanceBreaks} | Sharing Links: ${metrics.totalSharingLinks}`;
             console_.textContent += '\n\nSwitch to Visual Analytics tab for charts and deep dives.';
             await refreshAnalytics();
+            await showAuditSummary(console_);
             toast('Permissions analysis complete', 'success');
         } else {
             console_.textContent += `\nError: ${res.message}`;
@@ -876,6 +878,28 @@ function toast(message, type = 'info') {
     t.textContent = message;
     container.appendChild(t);
     setTimeout(() => t.remove(), 4000);
+}
+
+// --- Audit Summary ---
+async function showAuditSummary(console_) {
+    try {
+        const audit = await API.getAudit();
+        if (!audit.hasSession) return;
+
+        console_.textContent += '\n\n=== AUDIT TRAIL ===';
+        console_.textContent += `\nSession ID: ${audit.sessionId}`;
+        console_.textContent += `\nOperation: ${audit.operationType}`;
+        console_.textContent += `\nStatus: ${audit.status}`;
+        console_.textContent += `\nUser: ${audit.userPrincipal}`;
+        if (audit.duration) console_.textContent += `\nDuration: ${audit.duration}`;
+        console_.textContent += `\nEvents: ${audit.eventCount} | Errors: ${audit.errorCount}`;
+        if (audit.outputFiles && audit.outputFiles.length > 0) {
+            console_.textContent += `\nOutput files: ${audit.outputFiles.length}`;
+        }
+        console_.textContent += '\n(Full audit log saved to ./Logs/)';
+    } catch (e) {
+        // Audit info is supplementary, don't fail the operation
+    }
 }
 
 // --- Status polling (lightweight, once on load) ---
