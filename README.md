@@ -169,6 +169,8 @@ podman run -p 8080:8080 spo-analyzer
 podman compose down
 ```
 
+> **Note**: Live SharePoint connections use interactive browser auth, which is unavailable in headless containers. Use **Demo Mode** to explore all features in a container. For live SharePoint connections, run the tool directly on your host.
+
 ---
 
 ## 🖼️ Screenshots

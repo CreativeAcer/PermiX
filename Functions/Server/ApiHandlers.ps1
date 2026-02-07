@@ -79,8 +79,8 @@ function Handle-PostConnect {
 
     try {
         # Save settings
-        Save-AppSetting -SettingName "SharePoint.TenantUrl" -SettingValue $body.tenantUrl
-        Save-AppSetting -SettingName "SharePoint.ClientId" -SettingValue $body.clientId
+        Set-AppSetting -SettingName "SharePoint.TenantUrl" -Value $body.tenantUrl
+        Set-AppSetting -SettingName "SharePoint.ClientId" -Value $body.clientId
 
         # Check PnP module
         if (-not (Test-PnPModuleAvailable)) {

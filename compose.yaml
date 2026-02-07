@@ -7,6 +7,10 @@
 #   podman compose --profile local up  → WPF/XAML mode (Windows container only)
 #
 # Also works with docker compose.
+#
+# Note: Live SharePoint connections use interactive browser auth, which is
+# unavailable in headless containers. Use Demo Mode to explore all features.
+# For live connections, run the tool directly on your host instead.
 
 services:
   spo-web:
