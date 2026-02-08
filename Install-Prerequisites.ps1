@@ -233,7 +233,7 @@ Write-Host "• Improved error handling and diagnostics" -ForegroundColor White
 Write-Host "`nInstallation completed successfully!" -ForegroundColor Green
 Write-Host "`nNext steps:" -ForegroundColor Yellow
 Write-Host "1. Edit Config\Settings.json with your SharePoint tenant details" -ForegroundColor White
-Write-Host "2. Run Start-SPOTool.ps1 to launch the application" -ForegroundColor White
+Write-Host "2. Run Start-SPOTool-Web.ps1 to launch the web interface" -ForegroundColor White
 Write-Host "3. Use modern app registration authentication" -ForegroundColor White
 Write-Host "4. Try Demo Mode to test all features" -ForegroundColor White
 

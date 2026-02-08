@@ -12,7 +12,9 @@ SharePoint Online security and permissions analyzer with **risk assessment**, **
 
 Identifies security risks, stale accounts, anonymous sharing, and permission issues across your SharePoint environment.
 
-Runs as a **container**, **desktop app (WPF)**, or **local web server**.
+Runs as a **container** or **local web server** with a modern browser-based interface.
+
+> **Note**: As of 08/02/2026, the XAML/WPF desktop version has been removed to reduce complexity. The web interface provides all features with better cross-platform support.
 
 [Quick Start](#quick-start) | [Container](#container-deployment) | [Features](#features) | [Screenshots](#screenshots) | [App Registration](#app-registration)
 
@@ -34,28 +36,20 @@ podman compose up        # or: docker compose up
 
 Open `http://localhost:8080` in your browser.
 
-### Option B: Desktop (WPF)
+### Option B: Local Web Server
 
-Requires PowerShell 7+ and PnP.PowerShell on Windows.
+Requires PowerShell 7+ and PnP.PowerShell.
 
 ```powershell
 git clone https://github.com/CreativeAcer/SPO-Permissions-Analyzer.git
 cd SPO-Permissions-Analyzer
 .\Install-Prerequisites.ps1
-.\Start-SPOTool.ps1
-```
-
-### Option C: Web UI (direct)
-
-Same backend as the desktop app, browser-based frontend with Chart.js charts.
-
-```powershell
 .\Start-SPOTool-Web.ps1    # opens http://localhost:8080
 ```
 
 ### Demo Mode
 
-All three options support **Demo Mode** — click the button on the Connection tab to explore all features with sample data, no SharePoint connection required.
+Both options support **Demo Mode** — click the button on the Connection tab to explore all features with sample data, no SharePoint connection required.
 
 ---
 
@@ -146,8 +140,6 @@ Risk score (0-100) calculated from top 5 findings. Levels: Critical (80+), High 
 
 ## Screenshots
 
-### Web Version
-
 <div align="center">
 <p>
   <img src="Images/Visual-Analytics-web.png" width="90%" />
@@ -157,20 +149,6 @@ Risk score (0-100) calculated from top 5 findings. Levels: Critical (80+), High 
   <img src="Images/Enrich-Users-Web.png" width="45%" />
 </p>
 <em>Modern web interface with risk assessment, visual analytics, and external user enrichment.</em>
-</div>
-
-### Desktop Version (WPF)
-
-<div align="center">
-<p>
-  <img src="Images/main.png" width="45%" />
-  <img src="Images/Dashboard.png" width="45%" />
-</p>
-<p>
-  <img src="Images/Export.png" width="45%" />
-  <img src="Images/analyze.png" width="45%" />
-</p>
-<em>Desktop (WPF) interface. The web UI provides the same features in a browser.</em>
 </div>
 
 ---
@@ -211,35 +189,32 @@ Click **Grant admin consent** after adding all permissions.
 
 ```
 SPO-Permissions-Analyzer/
-├── Start-SPOTool.ps1              # WPF desktop entry point
 ├── Start-SPOTool-Web.ps1          # Web UI entry point
 ├── Dockerfile                     # Container image
 ├── compose.yaml                   # Podman/Docker compose
 ├── docker-entrypoint.ps1          # Container entrypoint
 ├── Install-Prerequisites.ps1      # Module installer
 ├── Functions/
-│   ├── Core/                      # Shared by both UIs
+│   ├── Core/                      # Core business logic
 │   │   ├── Settings.ps1
 │   │   ├── SharePointDataManager.ps1
+│   │   ├── RiskScoring.ps1
+│   │   ├── GraphEnrichment.ps1
 │   │   └── Logging.ps1
-│   ├── SharePoint/                # SharePoint operations (shared)
+│   ├── SharePoint/                # SharePoint operations
 │   │   └── SPOConnection.ps1
-│   ├── Server/                    # Web UI backend
-│   │   ├── WebServer.ps1
-│   │   └── ApiHandlers.ps1
-│   └── UI/                        # WPF interface
-│       ├── MainWindow.ps1
-│       ├── ConnectionTab.ps1
-│       ├── OperationsTab.ps1      # Data collection (shared by both UIs)
-│       ├── VisualAnalyticsTab.ps1
-│       └── DeepDive/              # 7 deep dive windows
-├── Views/                         # WPF XAML definitions
-│   ├── Windows/MainWindow.xaml
-│   └── DeepDive/                  # 7 deep dive XAMLs
-├── Web/                           # Web UI frontend
+│   └── Server/                    # Web backend
+│       ├── WebServer.ps1
+│       └── ApiHandlers.ps1
+├── Web/                           # Web frontend
 │   ├── index.html
 │   ├── css/app.css
-│   └── js/ (api.js, charts.js, app.js)
+│   └── js/
+│       ├── api.js
+│       ├── app.js
+│       ├── charts.js
+│       └── ui-helpers.js
+├── Images/                        # Screenshots
 ├── Logs/                          # Auto-created
 └── Reports/Generated/             # Auto-created
 ```

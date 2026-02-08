@@ -36,12 +36,7 @@ param(
 . "$PSScriptRoot\Functions\SharePoint\SPOConnection.ps1"
 
 # ============================================
-# 3. Load Operations (data collection logic, reused as-is)
-# ============================================
-. "$PSScriptRoot\Functions\UI\OperationsTab.ps1"
-
-# ============================================
-# 4. Load Web Server modules (replaces WPF UI layer)
+# 3. Load Web Server modules (contains all data collection logic)
 # ============================================
 . "$PSScriptRoot\Functions\Server\WebServer.ps1"
 . "$PSScriptRoot\Functions\Server\ApiHandlers.ps1"
