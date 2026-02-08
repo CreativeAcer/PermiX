@@ -181,41 +181,61 @@ function Handle-PostDemo {
         foreach ($site in $demoSites) { Add-SharePointSite -SiteData $site }
         Add-OperationLog "Added $($demoSites.Count) demo sites"
 
-        # Generate demo users
+        # Generate demo users (with diverse external users for risk testing)
         Set-SharePointOperationContext -OperationType "Demo - Permissions"
         $demoUsers = @(
+            # Internal users
             @{Name="John Doe"; Email="john.doe@contoso.com"; Type="Internal"; Permission="Full Control"; IsSiteAdmin=$true; LoginName="i:0#.f|membership|john.doe@contoso.com"},
             @{Name="Jane Smith"; Email="jane.smith@contoso.com"; Type="Internal"; Permission="Edit"; IsSiteAdmin=$false},
             @{Name="Mike Johnson"; Email="mike.j@contoso.com"; Type="Internal"; Permission="Read"; IsSiteAdmin=$false},
             @{Name="Sarah Wilson"; Email="sarah.w@contoso.com"; Type="Internal"; Permission="Contribute"; IsSiteAdmin=$false},
+            @{Name="David Brown"; Email="david.b@contoso.com"; Type="Internal"; Permission="Full Control"; IsSiteAdmin=$true},
+            @{Name="Emily Chen"; Email="emily.c@contoso.com"; Type="Internal"; Permission="Edit"; IsSiteAdmin=$false},
+            @{Name="Alex Kumar"; Email="alex.k@contoso.com"; Type="Internal"; Permission="Read"; IsSiteAdmin=$false},
+            @{Name="Lisa Anderson"; Email="lisa.a@contoso.com"; Type="Internal"; Permission="Contribute"; IsSiteAdmin=$false},
+            @{Name="Robert Taylor"; Email="robert.t@contoso.com"; Type="Internal"; Permission="Full Control"; IsSiteAdmin=$false},
+            @{Name="Michelle Lee"; Email="michelle.l@contoso.com"; Type="Internal"; Permission="Edit"; IsSiteAdmin=$false},
+
+            # External users - triggers EXT-001 (High - External with Edit+)
             @{Name="External Partner"; Email="partner@external.com"; Type="External"; Permission="Read"; IsExternal=$true},
             @{Name="Guest Reviewer"; Email="reviewer@partner.org"; Type="External"; Permission="Read"; IsExternal=$true},
             @{Name="Contractor A"; Email="contractor.a@vendor.com"; Type="External"; Permission="Edit"; IsExternal=$true},
-            @{Name="David Brown"; Email="david.b@contoso.com"; Type="Internal"; Permission="Full Control"; IsSiteAdmin=$true},
-            @{Name="Emily Chen"; Email="emily.c@contoso.com"; Type="Internal"; Permission="Edit"; IsSiteAdmin=$false},
-            @{Name="Alex Kumar"; Email="alex.k@contoso.com"; Type="Internal"; Permission="Read"; IsSiteAdmin=$false}
+            @{Name="Consultant Smith"; Email="j.smith@consulting-firm.com"; Type="External"; Permission="Full Control"; IsExternal=$true},
+            @{Name="External Dev"; Email="developer@techpartner.io"; Type="External"; Permission="Contribute"; IsExternal=$true},
+            @{Name="Agency Designer"; Email="design@agency.co"; Type="External"; Permission="Edit"; IsExternal=$true},
+            @{Name="Vendor Contact"; Email="sales@vendor-corp.net"; Type="External"; Permission="Edit"; IsExternal=$true},
+
+            # External admin - triggers EXT-002 (Critical - External Site Admin)
+            @{Name="External IT Partner"; Email="admin@it-partner.com"; Type="External"; Permission="Full Control"; IsSiteAdmin=$true; IsExternal=$true},
+
+            # More external users from diverse domains - triggers EXT-003 (Medium - Many domains)
+            @{Name="Auditor Jones"; Email="jones@audit-firm.biz"; Type="External"; Permission="Read"; IsExternal=$true},
+            @{Name="Legal Advisor"; Email="legal@lawfirm.legal"; Type="External"; Permission="Read"; IsExternal=$true},
+            @{Name="Marketing Guest"; Email="guest@marketing-agency.co.uk"; Type="External"; Permission="Contribute"; IsExternal=$true},
+            @{Name="Freelancer"; Email="freelance@personal-domain.me"; Type="External"; Permission="Edit"; IsExternal=$true}
         )
         foreach ($user in $demoUsers) { Add-SharePointUser -UserData $user }
-        Add-OperationLog "Added $($demoUsers.Count) demo users"
+        Add-OperationLog "Added $($demoUsers.Count) demo users (including $(@($demoUsers | Where-Object {$_.IsExternal}).Count) external)"
 
-        # Generate demo groups
+        # Generate demo groups (includes empty groups for GRP-001)
         $demoGroups = @(
             @{Name="Site Owners"; MemberCount=3; Permission="Full Control"; Description="Owners of the site"},
             @{Name="Site Members"; MemberCount=12; Permission="Edit"; Description="Members with edit access"},
             @{Name="Site Visitors"; MemberCount=25; Permission="Read"; Description="Visitors with read access"},
             @{Name="HR Team"; MemberCount=8; Permission="Contribute"; Description="Human Resources team"},
             @{Name="IT Admins"; MemberCount=4; Permission="Full Control"; Description="IT administrators"},
-            @{Name="Marketing Team"; MemberCount=15; Permission="Edit"; Description="Marketing department"}
+            @{Name="Marketing Team"; MemberCount=15; Permission="Edit"; Description="Marketing department"},
+            # Empty groups - triggers GRP-001 (Low - Empty groups)
+            @{Name="Legacy Project Team"; MemberCount=0; Permission="Edit"; Description="Old project team - no longer used"},
+            @{Name="Temp Contractors Group"; MemberCount=0; Permission="Contribute"; Description="Temporary group created for contractors"},
+            @{Name="Archive Access"; MemberCount=0; Permission="Read"; Description="Empty archive group"}
         )
         foreach ($group in $demoGroups) { Add-SharePointGroup -GroupData $group }
-        Add-OperationLog "Added $($demoGroups.Count) demo groups"
+        Add-OperationLog "Added $($demoGroups.Count) demo groups (including $(@($demoGroups | Where-Object {$_.MemberCount -eq 0}).Count) empty)"
 
-        # Generate demo role assignments
+        # Generate demo role assignments (includes many Full Control and direct user assignments)
         $demoRoles = @(
-            @{Principal="John Doe"; PrincipalType="User"; Role="Full Control"; Scope="Site"; ScopeUrl="https://contoso.sharepoint.com/sites/teamsite"; SiteTitle="Team Collaboration Site"},
-            @{Principal="Jane Smith"; PrincipalType="User"; Role="Edit"; Scope="Site"; ScopeUrl="https://contoso.sharepoint.com/sites/teamsite"; SiteTitle="Team Collaboration Site"},
-            @{Principal="Mike Johnson"; PrincipalType="User"; Role="Read"; Scope="Site"; ScopeUrl="https://contoso.sharepoint.com/sites/teamsite"; SiteTitle="Team Collaboration Site"},
-            @{Principal="External Partner"; PrincipalType="User"; Role="Read"; Scope="Library"; ScopeUrl="/sites/teamsite/Shared Documents"; SiteTitle="Team Collaboration Site"},
+            # Group assignments
             @{Principal="Site Owners"; PrincipalType="SharePoint Group"; Role="Full Control"; Scope="Site"; ScopeUrl="https://contoso.sharepoint.com/sites/teamsite"; SiteTitle="Team Collaboration Site"},
             @{Principal="Site Members"; PrincipalType="SharePoint Group"; Role="Edit"; Scope="Site"; ScopeUrl="https://contoso.sharepoint.com/sites/teamsite"; SiteTitle="Team Collaboration Site"},
             @{Principal="Site Visitors"; PrincipalType="SharePoint Group"; Role="Read"; Scope="Site"; ScopeUrl="https://contoso.sharepoint.com/sites/teamsite"; SiteTitle="Team Collaboration Site"},
@@ -223,10 +243,33 @@ function Handle-PostDemo {
             @{Principal="Finance Group"; PrincipalType="Security Group"; Role="Read"; Scope="List"; ScopeUrl="/sites/finance/Lists/Budget"; SiteTitle="Finance Department"},
             @{Principal="IT Admins"; PrincipalType="Security Group"; Role="Full Control"; Scope="Site"; ScopeUrl="https://contoso.sharepoint.com/sites/teamsite"; SiteTitle="Team Collaboration Site"},
             @{Principal="Marketing Team"; PrincipalType="Security Group"; Role="Edit"; Scope="Library"; ScopeUrl="/sites/marketing/Assets"; SiteTitle="Marketing Hub"},
-            @{Principal="Contractor A"; PrincipalType="User"; Role="Edit"; Scope="Library"; ScopeUrl="/sites/teamsite/Project Files"; SiteTitle="Team Collaboration Site"}
+
+            # Direct user assignments - triggers PERM-002 (Medium - >10 direct user assignments)
+            @{Principal="John Doe"; PrincipalType="User"; Role="Full Control"; Scope="Site"; ScopeUrl="https://contoso.sharepoint.com/sites/teamsite"; SiteTitle="Team Collaboration Site"},
+            @{Principal="Jane Smith"; PrincipalType="User"; Role="Edit"; Scope="Site"; ScopeUrl="https://contoso.sharepoint.com/sites/teamsite"; SiteTitle="Team Collaboration Site"},
+            @{Principal="Mike Johnson"; PrincipalType="User"; Role="Read"; Scope="Site"; ScopeUrl="https://contoso.sharepoint.com/sites/teamsite"; SiteTitle="Team Collaboration Site"},
+            @{Principal="External Partner"; PrincipalType="User"; Role="Read"; Scope="Library"; ScopeUrl="/sites/teamsite/Shared Documents"; SiteTitle="Team Collaboration Site"},
+            @{Principal="Contractor A"; PrincipalType="User"; Role="Edit"; Scope="Library"; ScopeUrl="/sites/teamsite/Project Files"; SiteTitle="Team Collaboration Site"},
+            @{Principal="Sarah Wilson"; PrincipalType="User"; Role="Contribute"; Scope="Library"; ScopeUrl="/sites/hr/Policies"; SiteTitle="HR Portal"},
+            @{Principal="David Brown"; PrincipalType="User"; Role="Full Control"; Scope="Site"; ScopeUrl="https://contoso.sharepoint.com/sites/hr"; SiteTitle="HR Portal"},
+            @{Principal="Emily Chen"; PrincipalType="User"; Role="Edit"; Scope="Library"; ScopeUrl="/sites/marketing/Assets"; SiteTitle="Marketing Hub"},
+            @{Principal="Alex Kumar"; PrincipalType="User"; Role="Read"; Scope="List"; ScopeUrl="/sites/finance/Lists/Budget"; SiteTitle="Finance Department"},
+            @{Principal="Lisa Anderson"; PrincipalType="User"; Role="Contribute"; Scope="Library"; ScopeUrl="/sites/teamsite/Shared Documents"; SiteTitle="Team Collaboration Site"},
+            @{Principal="Robert Taylor"; PrincipalType="User"; Role="Full Control"; Scope="Library"; ScopeUrl="/sites/finance/Shared Documents"; SiteTitle="Finance Department"},
+            @{Principal="Michelle Lee"; PrincipalType="User"; Role="Edit"; Scope="Site"; ScopeUrl="https://contoso.sharepoint.com/sites/marketing"; SiteTitle="Marketing Hub"},
+            @{Principal="External Dev"; PrincipalType="User"; Role="Contribute"; Scope="Library"; ScopeUrl="/sites/teamsite/Project Files"; SiteTitle="Team Collaboration Site"},
+            @{Principal="Agency Designer"; PrincipalType="User"; Role="Edit"; Scope="Library"; ScopeUrl="/sites/marketing/Assets"; SiteTitle="Marketing Hub"},
+
+            # Excessive Full Control assignments - triggers PERM-001 (High - >5 Full Control assignments)
+            @{Principal="Consultant Smith"; PrincipalType="User"; Role="Full Control"; Scope="Site"; ScopeUrl="https://contoso.sharepoint.com/sites/exec"; SiteTitle="Executive Dashboard"},
+            @{Principal="External IT Partner"; PrincipalType="User"; Role="Full Control"; Scope="Site"; ScopeUrl="https://contoso.sharepoint.com/sites/finance"; SiteTitle="Finance Department"},
+            @{Principal="Vendor Contact"; PrincipalType="User"; Role="Full Control"; Scope="Library"; ScopeUrl="/sites/teamsite/Shared Documents"; SiteTitle="Team Collaboration Site"},
+            @{Principal="Freelancer"; PrincipalType="User"; Role="Full Control"; Scope="Library"; ScopeUrl="/sites/marketing/Assets"; SiteTitle="Marketing Hub"}
         )
         foreach ($ra in $demoRoles) { Add-SharePointRoleAssignment -RoleData $ra }
-        Add-OperationLog "Added $($demoRoles.Count) role assignments"
+        $fullControlCount = @($demoRoles | Where-Object {$_.Role -eq "Full Control"}).Count
+        $directUserCount = @($demoRoles | Where-Object {$_.PrincipalType -eq "User"}).Count
+        Add-OperationLog "Added $($demoRoles.Count) role assignments ($fullControlCount Full Control, $directUserCount direct user assignments)"
 
         # Generate demo inheritance items
         $demoInheritance = @(
@@ -244,18 +287,39 @@ function Handle-PostDemo {
         foreach ($item in $demoInheritance) { Add-SharePointInheritanceItem -InheritanceData $item }
         Add-OperationLog "Added $($demoInheritance.Count) inheritance items"
 
-        # Generate demo sharing links
+        # Generate demo sharing links (includes anonymous edit links and many company-wide links)
         $demoLinks = @(
+            # Anonymous links - triggers SHARE-001 (Critical - Anonymous Edit) and SHARE-002 (High - Anonymous links)
+            @{GroupName="SharingLinks.abc125.AnonymousView.jkl012"; LinkType="Anonymous"; AccessLevel="View"; MemberCount=3; SiteTitle="Marketing Hub"; CreatedDate="2025-01-20"},
+            @{GroupName="SharingLinks.abc128.AnonymousEdit.stu901"; LinkType="Anonymous"; AccessLevel="Edit"; MemberCount=1; SiteTitle="Team Collaboration Site"; CreatedDate="2025-03-01"},
+            @{GroupName="SharingLinks.abc130.AnonymousEdit.xyz123"; LinkType="Anonymous"; AccessLevel="Edit"; MemberCount=2; SiteTitle="Marketing Hub"; CreatedDate="2024-12-15"},
+            @{GroupName="SharingLinks.abc131.AnonymousView.abc789"; LinkType="Anonymous"; AccessLevel="View"; MemberCount=5; SiteTitle="Team Collaboration Site"; CreatedDate="2025-02-05"},
+            @{GroupName="SharingLinks.abc132.AnonymousView.def456"; LinkType="Anonymous"; AccessLevel="View"; MemberCount=0; SiteTitle="HR Portal"; CreatedDate="2024-11-20"},
+
+            # Company-wide links - triggers SHARE-003 (Medium - >10 company-wide links)
             @{GroupName="SharingLinks.abc123.OrganizationView.def456"; LinkType="Company-wide"; AccessLevel="View"; MemberCount=0; SiteTitle="Team Collaboration Site"; CreatedDate="2025-01-15"},
             @{GroupName="SharingLinks.abc124.OrganizationEdit.ghi789"; LinkType="Company-wide"; AccessLevel="Edit"; MemberCount=0; SiteTitle="Marketing Hub"; CreatedDate="2025-02-01"},
-            @{GroupName="SharingLinks.abc125.AnonymousView.jkl012"; LinkType="Anonymous"; AccessLevel="View"; MemberCount=3; SiteTitle="Marketing Hub"; CreatedDate="2025-01-20"},
+            @{GroupName="SharingLinks.abc133.OrganizationView.ghi012"; LinkType="Organization"; AccessLevel="View"; MemberCount=0; SiteTitle="HR Portal"; CreatedDate="2025-01-10"},
+            @{GroupName="SharingLinks.abc134.OrganizationView.jkl345"; LinkType="Company-wide"; AccessLevel="View"; MemberCount=0; SiteTitle="Finance Department"; CreatedDate="2024-12-01"},
+            @{GroupName="SharingLinks.abc135.OrganizationView.mno678"; LinkType="Organization"; AccessLevel="View"; MemberCount=0; SiteTitle="Executive Dashboard"; CreatedDate="2025-01-05"},
+            @{GroupName="SharingLinks.abc136.OrganizationView.pqr901"; LinkType="Company-wide"; AccessLevel="View"; MemberCount=0; SiteTitle="Team Collaboration Site"; CreatedDate="2024-11-15"},
+            @{GroupName="SharingLinks.abc137.OrganizationView.stu234"; LinkType="Organization"; AccessLevel="View"; MemberCount=0; SiteTitle="Marketing Hub"; CreatedDate="2025-02-10"},
+            @{GroupName="SharingLinks.abc138.OrganizationView.vwx567"; LinkType="Company-wide"; AccessLevel="View"; MemberCount=0; SiteTitle="Team Collaboration Site"; CreatedDate="2024-10-20"},
+            @{GroupName="SharingLinks.abc139.OrganizationView.yza890"; LinkType="Organization"; AccessLevel="View"; MemberCount=0; SiteTitle="HR Portal"; CreatedDate="2025-01-20"},
+            @{GroupName="SharingLinks.abc140.OrganizationView.bcd123"; LinkType="Company-wide"; AccessLevel="View"; MemberCount=0; SiteTitle="Finance Department"; CreatedDate="2024-12-10"},
+            @{GroupName="SharingLinks.abc141.OrganizationView.efg456"; LinkType="Organization"; AccessLevel="View"; MemberCount=0; SiteTitle="Marketing Hub"; CreatedDate="2025-02-05"},
+            @{GroupName="SharingLinks.abc142.OrganizationView.hij789"; LinkType="Company-wide"; AccessLevel="View"; MemberCount=0; SiteTitle="Team Collaboration Site"; CreatedDate="2024-11-25"},
+
+            # Specific people links (normal, lower risk)
             @{GroupName="SharingLinks.abc126.Flexible.mno345"; LinkType="Specific People"; AccessLevel="Edit"; MemberCount=5; SiteTitle="Team Collaboration Site"; CreatedDate="2025-02-10"},
             @{GroupName="SharingLinks.abc127.Flexible.pqr678"; LinkType="Specific People"; AccessLevel="View"; MemberCount=2; SiteTitle="HR Portal"; CreatedDate="2025-01-25"},
-            @{GroupName="SharingLinks.abc128.AnonymousEdit.stu901"; LinkType="Anonymous"; AccessLevel="Edit"; MemberCount=1; SiteTitle="Team Collaboration Site"; CreatedDate="2025-03-01"},
             @{GroupName="SharingLinks.abc129.Flexible.vwx234"; LinkType="Specific People"; AccessLevel="Edit"; MemberCount=8; SiteTitle="Finance Department"; CreatedDate="2025-02-15"}
         )
         foreach ($link in $demoLinks) { Add-SharePointSharingLink -LinkData $link }
-        Add-OperationLog "Added $($demoLinks.Count) sharing links"
+        $anonymousCount = @($demoLinks | Where-Object {$_.LinkType -eq "Anonymous"}).Count
+        $anonymousEditCount = @($demoLinks | Where-Object {$_.LinkType -eq "Anonymous" -and $_.AccessLevel -eq "Edit"}).Count
+        $orgWideCount = @($demoLinks | Where-Object {$_.LinkType -in @("Company-wide", "Organization")}).Count
+        Add-OperationLog "Added $($demoLinks.Count) sharing links ($anonymousCount anonymous with $anonymousEditCount edit, $orgWideCount company-wide)"
 
         $metrics = Get-SharePointData -DataType "Metrics"
         Add-OperationLog ""

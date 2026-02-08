@@ -200,10 +200,10 @@ function Get-RiskAssessment {
     }
 
     $riskLevel = switch ($overallScore) {
-        { $_ -ge 80 } { "Critical" }
-        { $_ -ge 60 } { "High" }
-        { $_ -ge 30 } { "Medium" }
-        { $_ -gt 0 }  { "Low" }
+        { $_ -ge 80 } { "Critical"; break }
+        { $_ -ge 60 } { "High"; break }
+        { $_ -ge 30 } { "Medium"; break }
+        { $_ -gt 0 }  { "Low"; break }
         default        { "None" }
     }
 

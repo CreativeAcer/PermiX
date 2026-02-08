@@ -22,12 +22,17 @@ document.addEventListener('DOMContentLoaded', () => {
 // --- Tabs ---
 function initTabs() {
     document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', async () => {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             btn.classList.add('active');
             const target = document.getElementById('tab-' + btn.dataset.tab);
             if (target) target.classList.add('active');
+
+            // Refresh analytics when switching to visual-analytics tab
+            if (btn.dataset.tab === 'visual-analytics' && appState.dataLoaded) {
+                await refreshAnalytics();
+            }
         });
     });
 }
@@ -300,24 +305,48 @@ async function refreshAnalytics() {
 }
 
 async function refreshRiskBanner() {
+    console.log('[Risk] Refreshing risk banner...');
+    const banner = document.getElementById('risk-banner');
+
+    if (!banner) {
+        console.error('[Risk] Risk banner element not found in DOM');
+        return;
+    }
+
     try {
+        console.log('[Risk] Fetching risk assessment from API...');
         const risk = await API.getRisk();
-        const banner = document.getElementById('risk-banner');
-        if (!banner) return;
+        console.log('[Risk] Risk assessment received:', risk);
 
+        // Handle both camelCase (overallScore) and PascalCase (OverallScore) from backend
+        const overallScore = risk.overallScore ?? risk.OverallScore ?? 0;
+
+        // Handle riskLevel - it might be a string or an array (PowerShell switch bug)
+        let riskLevelRaw = risk.riskLevel ?? risk.RiskLevel ?? 'Unknown';
+        const riskLevel = Array.isArray(riskLevelRaw) ? riskLevelRaw[0] : riskLevelRaw;
+
+        const totalFindings = risk.totalFindings ?? risk.TotalFindings ?? 0;
+        const criticalCount = risk.criticalCount ?? risk.CriticalCount ?? 0;
+        const highCount = risk.highCount ?? risk.HighCount ?? 0;
+        const mediumCount = risk.mediumCount ?? risk.MediumCount ?? 0;
+        const lowCount = risk.lowCount ?? risk.LowCount ?? 0;
+
+        console.log('[Risk] Parsed values:', { overallScore, riskLevel, totalFindings });
+
+        // Always show the banner (remove hidden)
         banner.classList.remove('hidden', 'risk-critical', 'risk-high', 'risk-medium', 'risk-low', 'risk-none');
-        banner.classList.add('risk-' + risk.riskLevel.toLowerCase());
+        banner.classList.add('risk-' + riskLevel.toLowerCase());
 
-        setText('risk-score-value', risk.overallScore);
-        setText('risk-level', risk.riskLevel);
+        setText('risk-score-value', overallScore);
+        setText('risk-level', riskLevel);
 
         const parts = [];
-        if (risk.criticalCount > 0) parts.push(`${risk.criticalCount} critical`);
-        if (risk.highCount > 0) parts.push(`${risk.highCount} high`);
-        if (risk.mediumCount > 0) parts.push(`${risk.mediumCount} medium`);
-        if (risk.lowCount > 0) parts.push(`${risk.lowCount} low`);
+        if (criticalCount > 0) parts.push(`${criticalCount} critical`);
+        if (highCount > 0) parts.push(`${highCount} high`);
+        if (mediumCount > 0) parts.push(`${mediumCount} medium`);
+        if (lowCount > 0) parts.push(`${lowCount} low`);
         setText('risk-summary', parts.length > 0
-            ? `${risk.totalFindings} finding(s): ${parts.join(', ')}`
+            ? `${totalFindings} finding(s): ${parts.join(', ')}`
             : 'No security findings detected');
 
         // Wire up details button
@@ -328,8 +357,20 @@ async function refreshRiskBanner() {
 
         // Store risk data for reuse
         appState.riskData = risk;
+        console.log('[Risk] Risk banner updated successfully');
     } catch (e) {
-        console.error('Failed to load risk assessment:', e);
+        console.error('[Risk] Failed to load risk assessment:', e);
+        // Show error to user with toast
+        if (typeof toast === 'function') {
+            toast('Risk assessment unavailable: ' + e.message, 'error');
+        }
+        // Still show banner with zero state
+        banner.classList.remove('hidden', 'risk-critical', 'risk-high', 'risk-medium', 'risk-low', 'risk-none');
+        banner.classList.add('risk-none');
+        setText('risk-score-value', '0');
+        setText('risk-level', 'Unknown');
+        setText('risk-summary', 'Risk assessment unavailable');
+        console.log('[Risk] Risk banner set to error state');
     }
 }
 
@@ -348,6 +389,7 @@ function openRiskDeepDive(risk) {
 
     const severityColors = { Critical: '#DC3545', High: '#E65100', Medium: '#FFC107', Low: '#28A745' };
 
+    // Stats section
     let html = `<div class="dd-stats">
         <div class="dd-stat"><span class="dd-stat-value" style="color:${severityColors[risk.riskLevel] || '#6C757D'}">${risk.overallScore}</span><span class="dd-stat-label">Risk Score</span></div>
         <div class="dd-stat"><span class="dd-stat-value" style="color:#DC3545">${risk.criticalCount}</span><span class="dd-stat-label">Critical</span></div>
@@ -356,20 +398,66 @@ function openRiskDeepDive(risk) {
         <div class="dd-stat"><span class="dd-stat-value" style="color:#28A745">${risk.lowCount}</span><span class="dd-stat-label">Low</span></div>
     </div>`;
 
+    // Filter buttons
+    html += `<div style="margin: 16px 0; display: flex; gap: 8px; flex-wrap: wrap;">
+        <button class="btn btn-secondary" onclick="filterRiskFindings('all')" style="padding: 6px 12px; font-size: 13px;">All (${risk.totalFindings})</button>
+        <button class="btn btn-secondary" onclick="filterRiskFindings('Critical')" style="padding: 6px 12px; font-size: 13px; background: #DC3545; color: white;">Critical (${risk.criticalCount})</button>
+        <button class="btn btn-secondary" onclick="filterRiskFindings('High')" style="padding: 6px 12px; font-size: 13px; background: #E65100; color: white;">High (${risk.highCount})</button>
+        <button class="btn btn-secondary" onclick="filterRiskFindings('Medium')" style="padding: 6px 12px; font-size: 13px; background: #FFC107; color: white;">Medium (${risk.mediumCount})</button>
+        <button class="btn btn-secondary" onclick="filterRiskFindings('Low')" style="padding: 6px 12px; font-size: 13px; background: #28A745; color: white;">Low (${risk.lowCount})</button>
+    </div>`;
+
+    // Findings container
+    html += '<div id="risk-findings-container">';
     if (risk.findings && risk.findings.length > 0) {
-        html += risk.findings.map(f => {
+        html += risk.findings.map((f, idx) => {
             const sev = f.Severity || f.severity;
+            const category = f.Category || f.category || 'General';
+            const count = f.Count || f.count || 0;
             const color = severityColors[sev] || '#6C757D';
-            return `<div class="finding ${(sev || '').toLowerCase()}" style="border-left: 4px solid ${color}; margin-bottom: 8px;">
-                <h4>[${esc(f.RuleId || f.ruleId)}] ${esc(f.Title || f.title)} <span style="color:${color};font-size:12px">(${sev}, Score: ${f.Score || f.score})</span></h4>
-                <p>${esc(f.Description || f.description)}</p>
+            return `<div class="finding finding-item" data-severity="${sev}" style="border-left: 4px solid ${color}; margin-bottom: 12px; padding: 12px; background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); cursor: pointer; transition: all 0.2s;" onclick="toggleFindingDetails(${idx})">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                    <h4 style="margin: 0 0 8px 0; font-size: 15px;">[${esc(f.RuleId || f.ruleId)}] ${esc(f.Title || f.title)}</h4>
+                    <span style="background: ${color}; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">${sev}</span>
+                </div>
+                <div style="display: flex; gap: 16px; margin-bottom: 8px; font-size: 12px; color: #666;">
+                    <span><strong>Category:</strong> ${esc(category)}</span>
+                    ${count > 0 ? `<span><strong>Affected Items:</strong> ${count}</span>` : ''}
+                    <span><strong>Score:</strong> ${f.Score || f.score}/100</span>
+                </div>
+                <p style="margin: 0; color: #333;">${esc(f.Description || f.description)}</p>
+                <div id="finding-details-${idx}" style="display: none; margin-top: 12px; padding-top: 12px; border-top: 1px solid #E5E7EB;">
+                    <p style="margin: 0; font-size: 13px; color: #666;"><strong>Recommendation:</strong> Review and remediate this finding to improve your security posture.</p>
+                </div>
             </div>`;
         }).join('');
     } else {
         html += '<div class="finding low"><h4>No Issues Found</h4><p>No security findings detected. Your environment looks clean.</p></div>';
     }
+    html += '</div>';
 
     body.innerHTML = html;
+
+    // Store findings for filtering
+    window.currentRiskFindings = risk.findings || [];
+}
+
+function filterRiskFindings(severity) {
+    const findings = document.querySelectorAll('.finding-item');
+    findings.forEach(f => {
+        if (severity === 'all' || f.dataset.severity === severity) {
+            f.style.display = 'block';
+        } else {
+            f.style.display = 'none';
+        }
+    });
+}
+
+function toggleFindingDetails(idx) {
+    const details = document.getElementById(`finding-details-${idx}`);
+    if (details) {
+        details.style.display = details.style.display === 'none' ? 'block' : 'none';
+    }
 }
 
 function renderSitesTable(sites) {
@@ -615,7 +703,31 @@ function renderExternalDeepDive(container, allUsers) {
             // Reload external users data
             const usersRes = await API.getData('users');
             const newData = (usersRes.data || []).filter(u => u.Type === 'External' || u.IsExternal);
+
+            // Recalculate statistics with updated data
+            const domains = {};
+            newData.forEach(u => {
+                const email = u.Email || '';
+                const domain = email.includes('@') ? email.split('@')[1] : 'Unknown';
+                domains[domain] = (domains[domain] || 0) + 1;
+            });
+            const editAccess = newData.filter(u => ['Edit', 'Contribute', 'Full Control'].includes(u.Permission)).length;
+            const enrichedCount = newData.filter(u => u.GraphEnriched).length;
+
+            // Update the stats in the dd-stats section
+            const statsSection = document.querySelector('.dd-stats');
+            if (statsSection) {
+                statsSection.innerHTML = `
+                    <div class="dd-stat"><span class="dd-stat-value" style="color:#C62828">${newData.length}</span><span class="dd-stat-label">External Users</span></div>
+                    <div class="dd-stat"><span class="dd-stat-value">${Object.keys(domains).length}</span><span class="dd-stat-label">Domains</span></div>
+                    <div class="dd-stat"><span class="dd-stat-value" style="color:#DC3545">${editAccess}</span><span class="dd-stat-label">With Edit+</span></div>
+                    <div class="dd-stat"><span class="dd-stat-value" style="color:#0078D4">${enrichedCount}</span><span class="dd-stat-label">Enriched</span></div>
+                `;
+            }
+
+            // Update the table body
             document.getElementById('dd-ext-body').innerHTML = renderExternalRows(newData);
+
             // Show enrichment summary
             showEnrichmentBanner();
         } catch (e) {
@@ -658,12 +770,34 @@ function renderExternalRows(data) {
     return data.map(u => {
         const email = u.Email || '';
         const domain = email.includes('@') ? email.split('@')[1] : 'Unknown';
-        const accountStatus = u.GraphEnriched
-            ? (u.GraphAccountEnabled ? '<span style="color:#28A745">Active</span>' : '<span style="color:#DC3545">Disabled</span>')
-            : '<span style="color:#999">-</span>';
+
+        // Calculate if account is stale (90+ days since last sign-in)
+        let isStale = false;
+        if (u.GraphLastSignIn) {
+            const daysSinceSignIn = (Date.now() - new Date(u.GraphLastSignIn)) / (1000 * 60 * 60 * 24);
+            isStale = daysSinceSignIn > 90;
+        } else if (u.GraphCreatedDate && u.GraphEnriched) {
+            // Never signed in, check if created more than 90 days ago
+            const daysSinceCreated = (Date.now() - new Date(u.GraphCreatedDate)) / (1000 * 60 * 60 * 24);
+            isStale = daysSinceCreated > 90;
+        }
+
+        // Build account status display
+        let accountStatus = '<span style="color:#999">-</span>';
+        if (u.GraphEnriched) {
+            if (!u.GraphAccountEnabled) {
+                accountStatus = '<span style="color:#DC3545">Disabled</span>';
+            } else if (isStale) {
+                accountStatus = '<span style="color:#28A745">Active</span> <span style="color:#F59E0B;font-size:11px">⚠ Stale</span>';
+            } else {
+                accountStatus = '<span style="color:#28A745">Active</span>';
+            }
+        }
+
         const lastSignIn = u.GraphLastSignIn
             ? new Date(u.GraphLastSignIn).toLocaleDateString()
-            : (u.GraphEnriched ? 'Never' : '-');
+            : (u.GraphEnriched ? '<span style="color:#DC3545">Never</span>' : '-');
+
         return `<tr><td>${esc(u.Name)}</td><td>${esc(email)}</td><td>${esc(domain)}</td><td>${esc(u.Permission)}</td><td>${accountStatus}</td><td>${lastSignIn}</td></tr>`;
     }).join('');
 }
