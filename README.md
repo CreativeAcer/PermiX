@@ -8,9 +8,9 @@
 ![Container](https://img.shields.io/badge/Container-Podman%20%7C%20Docker-blue?style=for-the-badge&logo=podman&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 
-Comprehensive SharePoint Online security and permissions analyzer with **risk assessment**, **Microsoft Graph enrichment**, and **modern web UI**.
+SharePoint Online security and permissions analyzer with **risk assessment**, **external user enrichment**, and **visual analytics**.
 
-Features include external user tracking with stale account detection, 11-rule security scoring system, sharing link audit, and permission inheritance analysis.
+Identifies security risks, stale accounts, anonymous sharing, and permission issues across your SharePoint environment.
 
 Runs as a **container**, **desktop app (WPF)**, or **local web server**.
 
@@ -98,90 +98,49 @@ The device code appears in the container terminal. Open `https://microsoft.com/d
 - Site-level permissions with inheritance detection
 - User enumeration with internal/external classification
 - Group analysis with member counts
-- Role assignment mapping — who has what permission on what resource
-- Permission inheritance tree — detects broken inheritance at site, list, and library levels
-- Sharing link audit — anonymous, company-wide, and specific-people links
+- Role assignment mapping across all resources
+- Permission inheritance tree with broken inheritance detection
+- Sharing link audit (anonymous, company-wide, specific-people)
 
-### Risk Assessment & Security
-- **Comprehensive risk scoring** — 11 security rules across 4 severity levels (Critical, High, Medium, Low)
-- **Security findings** — identifies external admins, anonymous edit links, excessive permissions, and broken inheritance
-- **Risk categories** — External Access, Sharing Links, Permissions, Inheritance, and Groups
-- **Filterable findings** — filter by severity with one click (All, Critical, High, Medium, Low)
-- **Expandable details** — click any finding to see category, affected items count, score, and remediation guidance
-- **Overall risk score** — weighted calculation (0-100) based on top 5 findings
-- **Visual risk banner** — color-coded indicator (Critical/High/Medium/Low/None) on analytics dashboard
+### Risk Assessment
+- **11 security rules** across Critical, High, Medium, and Low severity levels
+- **Overall risk score** (0-100) with color-coded dashboard banner
+- **Identifies**: external admins, anonymous edit links, excessive permissions, broken inheritance, stale accounts, empty groups
+- **Filterable findings** by severity with detailed remediation guidance
 
-### Microsoft Graph Enrichment
-- **External user enrichment** — enriches external users with live Microsoft Graph data
-- **Account status** — shows Active, Disabled, or Stale (90+ days inactive) with visual indicators
-- **Last sign-in tracking** — displays last sign-in date or "Never" for unused accounts
-- **Stale account detection** — automatically identifies accounts inactive for 90+ days
-- **Guest user identification** — tracks guest vs external member accounts
-- **Domain analysis** — aggregates external users by email domain
-- **Enrichment summary** — post-enrichment banner shows disabled, stale, and guest account counts
+### External User Enrichment
+- **Microsoft Graph integration** — enriches external users with live account data
+- **Stale account detection** — flags accounts inactive for 90+ days
+- **Account status tracking** — Active, Disabled, or Never signed in
+- **Domain analysis** — aggregates external users by organization
 
 ### Deep Dive Views
-- **Sites** — storage analysis, health scoring, hub site tracking, filterable grid
-- **Users** — permission breakdown, internal vs external, security risk assessment
-- **Groups** — membership analysis, empty group detection, size distribution
-- **External Users** — domain analysis, access level audit, Graph enrichment with stale account warnings
-- **Role Assignments** — principal-to-permission mapping with chart and security review
+- **Sites** — storage analysis, health scoring, filterable grid
+- **Users** — permission breakdown, internal vs external classification
+- **Groups** — membership analysis, empty group detection
+- **External Users** — domain analysis, access audit, enrichment with stale warnings
+- **Role Assignments** — principal-to-permission mapping with security review
 - **Inheritance** — broken inheritance overview with percentage scoring
-- **Sharing Links** — link type distribution, anonymous edit detection, exportable findings
+- **Sharing Links** — link type distribution, anonymous edit detection
 
-### Modern Web UI
-- **Phase 1-3 modernization** — contemporary design rivaling premium SaaS products
-- **100+ CSS variables** — consistent theming and color system
-- **35+ helper functions** — UIHelpers library for common operations
-- **20+ animations** — smooth micro-interactions and loading states
-- **Advanced components** — skeleton loaders, enhanced forms, toast notifications, badges
-- **Sortable tables** — click headers to sort ascending/descending
-- **Search & filter** — real-time table filtering with highlighted results
-- **Interactive charts** — Chart.js with gradients, animations, and hover effects
-- **Responsive design** — works on desktop, tablet, and mobile
-- **Accessibility** — WCAG AA compliant with keyboard navigation and screen reader support
-
-### Export
-- CSV export from every deep dive view
-- Per-type data export (sites, users, groups, role assignments, inheritance, sharing links)
-- Risk findings export (includes all security findings with scores and recommendations)
+### Export & UI
+- CSV export from all deep dive views and risk findings
+- Sortable/filterable tables with real-time search
+- Interactive charts and visual analytics
+- Responsive design for desktop and mobile
 
 ---
 
 ## Security Rules
 
-The risk assessment engine evaluates your SharePoint environment against 11 security rules:
+11 rules evaluate your environment across External Access, Sharing Links, Permissions, Inheritance, and Groups.
 
-### Critical Severity
-| Rule ID | Title | Trigger | Score |
-|---------|-------|---------|-------|
-| **EXT-002** | External users with site admin rights | External user has site admin | 100 |
-| **SHARE-001** | Anonymous edit links detected | Anonymous links allow editing | 100 |
+**Critical**: External site admins, anonymous edit links
+**High**: External users with elevated permissions, anonymous links, excessive Full Control, broken inheritance
+**Medium**: Multiple external domains, excessive org-wide links, direct user assignments
+**Low**: Empty groups
 
-### High Severity
-| Rule ID | Title | Trigger | Score |
-|---------|-------|---------|-------|
-| **EXT-001** | External users with edit+ permissions | External users with Edit/Contribute/Full Control | 15 per user (max 100) |
-| **SHARE-002** | Anonymous sharing links exist | Any anonymous links found | 20 per link (max 90) |
-| **PERM-001** | Excessive Full Control assignments | More than 5 Full Control assignments | 8 per assignment (max 80) |
-| **INH-001** | Majority of items have broken inheritance | >50% of items have unique permissions | Max 85 |
-
-### Medium Severity
-| Rule ID | Title | Trigger | Score |
-|---------|-------|---------|-------|
-| **EXT-003** | External access from many domains | External users from >5 domains | 5 per domain (max 70) |
-| **SHARE-003** | Excessive company-wide sharing links | More than 10 organization-wide links | 3 per link (max 60) |
-| **PERM-002** | Many direct user permission assignments | More than 10 direct user assignments | 3 per assignment (max 50) |
-| **INH-002** | Significant inheritance breaks | 25-50% of items have unique permissions | Max 60 |
-
-### Low Severity
-| Rule ID | Title | Trigger | Score |
-|---------|-------|---------|-------|
-| **GRP-001** | Empty groups detected | Groups with zero members | 5 per group (max 30) |
-
-**Overall Risk Score**: Calculated as the weighted average of the top 5 findings (max 100).
-
-**Risk Levels**: Critical (80-100), High (60-79), Medium (30-59), Low (1-29), None (0).
+Risk score (0-100) calculated from top 5 findings. Levels: Critical (80+), High (60-79), Medium (30-59), Low (1-29), None (0).
 
 ---
 
