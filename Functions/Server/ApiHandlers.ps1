@@ -160,7 +160,7 @@ function Handle-PostDemo {
         $script:DemoMode = $true
         $script:SPOConnected = $true
 
-        Initialize-SharePointDataManager
+        Clear-SharePointData -DataType "All"
 
         # Re-use existing demo data generators
         $script:ServerState.OperationLog.Clear()

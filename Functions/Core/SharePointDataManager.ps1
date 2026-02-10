@@ -242,7 +242,28 @@ function Clear-SharePointData {
             $script:SharePointData.OperationMetrics.TotalSharingLinks = 0
         }
         "All" {
-            Initialize-SharePointDataManager
+            # Clear each collection in-place to preserve the shared hashtable reference
+            # (Initialize-SharePointDataManager creates a new hashtable which breaks
+            # the reference held by ServerState.SharePointData in background runspaces)
+            $script:SharePointData.Sites.Clear()
+            $script:SharePointData.Users.Clear()
+            $script:SharePointData.Groups.Clear()
+            $script:SharePointData.Permissions.Clear()
+            $script:SharePointData.RoleAssignments.Clear()
+            $script:SharePointData.InheritanceItems.Clear()
+            $script:SharePointData.SharingLinks.Clear()
+            $script:SharePointData.LastOperation = ""
+            $script:SharePointData.LastUpdateTime = $null
+            $script:SharePointData.OperationMetrics.TotalSites = 0
+            $script:SharePointData.OperationMetrics.TotalUsers = 0
+            $script:SharePointData.OperationMetrics.TotalGroups = 0
+            $script:SharePointData.OperationMetrics.ExternalUsers = 0
+            $script:SharePointData.OperationMetrics.SecurityFindings = 0
+            $script:SharePointData.OperationMetrics.RecordsProcessed = 0
+            $script:SharePointData.OperationMetrics.TotalRoleAssignments = 0
+            $script:SharePointData.OperationMetrics.InheritanceBreaks = 0
+            $script:SharePointData.OperationMetrics.TotalSharingLinks = 0
+            Write-ActivityLog "SharePoint Data Manager cleared" -Level "Information"
         }
     }
 
