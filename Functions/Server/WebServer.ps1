@@ -332,11 +332,29 @@ function Start-BackgroundOperation {
         # Use the operation-specific site URL if available (e.g. for permissions analysis),
         # otherwise fall back to the tenant root URL (e.g. for site enumeration).
         $connectUrl = if ($SharedState.OperationSiteUrl) { $SharedState.OperationSiteUrl } else { $TenantUrl }
-        if ($AccessToken -and $connectUrl) {
-            try {
-                Connect-PnPOnline -Url $connectUrl -AccessToken $AccessToken -ErrorAction Stop
-            } catch {
-                [void]$SharedState.OperationLog.Add("Warning: Could not re-establish PnP connection in background: $($_.Exception.Message)")
+        if ($connectUrl) {
+            $connected = $false
+
+            # Preferred: use -ClientId -Interactive, which leverages MSAL's persistent
+            # token cache from the user's earlier interactive login.  MSAL will silently
+            # acquire a token without showing a browser popup.
+            if ($ClientId) {
+                try {
+                    Connect-PnPOnline -Url $connectUrl -ClientId $ClientId -Interactive -ErrorAction Stop
+                    $connected = $true
+                } catch {
+                    [void]$SharedState.OperationLog.Add("Note: Silent auth failed, trying access token fallback...")
+                }
+            }
+
+            # Fallback: use the forwarded access token string
+            if (-not $connected -and $AccessToken) {
+                try {
+                    Connect-PnPOnline -Url $connectUrl -AccessToken $AccessToken -ErrorAction Stop
+                    $connected = $true
+                } catch {
+                    [void]$SharedState.OperationLog.Add("Warning: Could not re-establish PnP connection in background: $($_.Exception.Message)")
+                }
             }
         }
 
