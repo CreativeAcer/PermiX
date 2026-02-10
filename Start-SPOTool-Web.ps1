@@ -37,7 +37,12 @@ param(
 . "$PSScriptRoot\Functions\SharePoint\PermissionsMatrix.ps1"
 
 # ============================================
-# 3. Load Web Server modules (contains all data collection logic)
+# 3. Load Operations modules (real-mode data collection)
+# ============================================
+. "$PSScriptRoot\Functions\UI\OperationsTab.ps1"
+
+# ============================================
+# 4. Load Web Server modules (HTTP server and API handlers)
 # ============================================
 . "$PSScriptRoot\Functions\Server\WebServer.ps1"
 . "$PSScriptRoot\Functions\Server\ApiHandlers.ps1"
