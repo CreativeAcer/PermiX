@@ -170,7 +170,6 @@ a:hover {
     justify-content: space-between;
     box-shadow: var(--shadow-md);
     position: relative;
-    overflow: hidden;
 }
 
 #app-header::before {
