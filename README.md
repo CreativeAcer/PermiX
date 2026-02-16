@@ -8,13 +8,13 @@
 ![Container](https://img.shields.io/badge/Container-Podman%20%7C%20Docker-blue?style=for-the-badge&logo=podman&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 
-SharePoint Online security and permissions analyzer with **risk assessment**, **external user enrichment**, and **visual analytics**.
+Ever wondered who actually has access to what in your SharePoint environment? This tool answers that question — with **risk scoring**, **external user enrichment via Microsoft Graph**, and **interactive visual analytics**.
 
-Identifies security risks, stale accounts, anonymous sharing, and permission issues across your SharePoint environment.
+Spot security risks, stale accounts, anonymous sharing links, and broken inheritance across your entire SharePoint Online tenant, all from a clean browser-based dashboard.
 
-Runs as a **container** or **local web server** with a modern browser-based interface.
+Runs as a **container** (zero local setup) or a **local web server**. No agents, no cloud services — just PowerShell, a browser, and your app registration.
 
-> **Note**: As of 08/02/2026, the XAML/WPF desktop version has been removed to reduce complexity. The web interface provides all features with better cross-platform support.
+> **Note**: As of 08/02/2026, the XAML/WPF desktop version has been removed. The web interface covers all features and works on any OS.
 
 [Quick Start](#quick-start) | [Container](#container-deployment) | [Features](#features) | [Screenshots](#screenshots) | [App Registration](#app-registration)
 
@@ -24,9 +24,9 @@ Runs as a **container** or **local web server** with a modern browser-based inte
 
 ## Quick Start
 
-### Option A: Container (recommended)
+### Option A: Container ✅ recommended
 
-No local PowerShell or module installation required.
+Zero local dependencies — just Podman or Docker.
 
 ```bash
 git clone https://github.com/CreativeAcer/SPO-Permissions-Analyzer.git
@@ -34,7 +34,7 @@ cd SPO-Permissions-Analyzer
 podman compose up        # or: docker compose up
 ```
 
-Open `http://localhost:8080` in your browser.
+Open `http://localhost:8080` and you're in.
 
 ### Option B: Local Web Server
 
@@ -47,9 +47,9 @@ cd SPO-Permissions-Analyzer
 .\Start-SPOTool-Web.ps1    # opens http://localhost:8080
 ```
 
-### Demo Mode
+### Not ready to connect yet?
 
-Both options support **Demo Mode** — click the button on the Connection tab to explore all features with sample data, no SharePoint connection required.
+Hit **Demo Mode** on the Connection tab — it loads realistic sample data so you can explore every feature without a SharePoint connection.
 
 ---
 
@@ -88,7 +88,7 @@ The device code appears in the container terminal. Open `https://microsoft.com/d
 
 ## Features
 
-### Permission Analysis
+### 🔐 Permission Analysis
 - Site-level permissions with inheritance detection
 - User enumeration with internal/external classification
 - Group analysis with member counts
@@ -96,32 +96,32 @@ The device code appears in the container terminal. Open `https://microsoft.com/d
 - Permission inheritance tree with broken inheritance detection
 - Sharing link audit (anonymous, company-wide, specific-people)
 
-### Risk Assessment
+### ⚠️ Risk Assessment
 - **11 security rules** across Critical, High, Medium, and Low severity levels
-- **Overall risk score** (0-100) with color-coded dashboard banner
-- **Identifies**: external admins, anonymous edit links, excessive permissions, broken inheritance, stale accounts, empty groups
+- **Overall risk score** (0-100) with a color-coded dashboard banner — you'll know immediately if something's wrong
+- **Catches**: external admins, anonymous edit links, excessive permissions, broken inheritance, stale accounts, empty groups
 - **Filterable findings** by severity with detailed remediation guidance
 
-### External User Enrichment
-- **Microsoft Graph integration** — enriches external users with live account data
+### 👥 External User Enrichment
+- **Microsoft Graph integration** — enriches external users with live account status
 - **Stale account detection** — flags accounts inactive for 90+ days
 - **Account status tracking** — Active, Disabled, or Never signed in
-- **Domain analysis** — aggregates external users by organization
+- **Domain analysis** — aggregates external users by organization so you can see who's really in your tenant
 
-### Deep Dive Views
+### 🔎 Deep Dive Views
 - **Sites** — storage analysis, health scoring, filterable grid
 - **Users** — permission breakdown, internal vs external classification
 - **Groups** — membership analysis, empty group detection
 - **External Users** — domain analysis, access audit, enrichment with stale warnings
 - **Role Assignments** — principal-to-permission mapping with security review
-- **Inheritance** — broken inheritance overview with percentage scoring, **interactive tree view** showing parent-child hierarchy
+- **Inheritance** — broken inheritance overview with percentage scoring + **interactive tree view** showing the full parent-child hierarchy
 - **Sharing Links** — link type distribution, anonymous edit detection
 
-### Interactive UI Features
-- **Global search** — Omnibox search across sites, users, groups with keyboard shortcuts (Ctrl+K / Cmd+K)
-- **Clickable charts** — Click any chart bar or segment to drill down into detailed data
-- **Tree visualizations** — Collapsible hierarchical view of permission inheritance
-- **Format selection** — Export any data as CSV or JSON with format chooser modal
+### 🖱️ Interactive UI
+- **Global search** — Omnibox (Ctrl+K / Cmd+K) searches across sites, users, and groups instantly
+- **Clickable charts** — click any bar or segment to drill straight into the underlying data
+- **Tree visualizations** — collapsible hierarchical view of permission inheritance
+- **Export anywhere** — CSV or JSON with a format chooser modal on every table
 - Sortable/filterable tables with real-time search
 - Responsive design for desktop and mobile
 
@@ -129,14 +129,16 @@ The device code appears in the container terminal. Open `https://microsoft.com/d
 
 ## Security Rules
 
-11 rules evaluate your environment across External Access, Sharing Links, Permissions, Inheritance, and Groups.
+11 rules evaluate your environment across five categories: External Access, Sharing Links, Permissions, Inheritance, and Groups.
 
-**Critical**: External site admins, anonymous edit links
-**High**: External users with elevated permissions, anonymous links, excessive Full Control, broken inheritance
-**Medium**: Multiple external domains, excessive org-wide links, direct user assignments
-**Low**: Empty groups
+| Severity | What it catches |
+|----------|----------------|
+| 🔴 **Critical** | External site admins, anonymous edit links |
+| 🟠 **High** | External users with elevated permissions, anonymous links, excessive Full Control, broken inheritance |
+| 🟡 **Medium** | Multiple external domains, excessive org-wide links, direct user assignments |
+| 🔵 **Low** | Empty groups |
 
-Risk score (0-100) calculated from top 5 findings. Levels: Critical (80+), High (60-79), Medium (30-59), Low (1-29), None (0).
+Risk score (0–100) is calculated from the top 5 findings. Levels: **Critical** 80+, **High** 60–79, **Medium** 30–59, **Low** 1–29, **None** 0.
 
 ---
 
@@ -193,34 +195,62 @@ Click **Grant admin consent** after adding all permissions.
 
 ```
 SPO-Permissions-Analyzer/
-├── Start-SPOTool-Web.ps1          # Web UI entry point
-├── Dockerfile                     # Container image
-├── compose.yaml                   # Podman/Docker compose
-├── docker-entrypoint.ps1          # Container entrypoint
-├── Install-Prerequisites.ps1      # Module installer
+├── Start-SPOTool-Web.ps1           # 🚀 Web UI entry point (local mode)
+├── Dockerfile                      # 🐳 Container image definition
+├── compose.yaml                    # 📦 Podman/Docker Compose config
+├── docker-entrypoint.ps1           # ⚙️  Container startup script
+├── Install-Prerequisites.ps1       # 📥 Module installer for local mode
+│
 ├── Functions/
-│   ├── Core/                      # Core business logic
-│   │   ├── Settings.ps1
-│   │   ├── SharePointDataManager.ps1
-│   │   ├── RiskScoring.ps1
-│   │   ├── GraphEnrichment.ps1
-│   │   └── Logging.ps1
-│   ├── SharePoint/                # SharePoint operations
-│   │   └── SPOConnection.ps1
-│   └── Server/                    # Web backend
-│       ├── WebServer.ps1
-│       └── ApiHandlers.ps1
-├── Web/                           # Web frontend
-│   ├── index.html
-│   ├── css/app.css
+│   ├── Core/                       # 🧠 Core infrastructure & utilities
+│   │   ├── AuditLog.ps1            #    Audit trail logging
+│   │   ├── Checkpoint.ps1          #    Analysis checkpoint/resume support
+│   │   ├── Logging.ps1             #    General logging helpers
+│   │   ├── OutputAdapter.ps1       #    Output formatting adapter
+│   │   ├── Settings.ps1            #    Configuration management
+│   │   ├── SharePointDataManager.ps1 #  Central data store & caching
+│   │   └── ThrottleProtection.ps1  #    API throttle/rate-limit handling
+│   │
+│   ├── Analysis/                   # 🔍 Data analysis & enrichment
+│   │   ├── GraphEnrichment.ps1     #    Microsoft Graph user enrichment
+│   │   ├── JsonExport.ps1          #    JSON export formatting
+│   │   └── RiskScoring.ps1         #    Security risk scoring engine
+│   │
+│   ├── SharePoint/                 # 🏢 SharePoint data collection
+│   │   ├── PermissionsCollector.ps1 #   Collects all permission assignments
+│   │   ├── PermissionsMatrix.ps1   #    Builds permission matrix view
+│   │   ├── SiteCollector.ps1       #    Site enumeration & metadata
+│   │   └── SPOConnection.ps1       #    Authentication & connection handling
+│   │
+│   ├── Server/                     # 🌐 Web server & API backend
+│   │   ├── ApiHandlers.ps1         #    REST API route handlers
+│   │   ├── BackgroundJobManager.ps1 #   Background analysis job runner
+│   │   └── WebServer.ps1           #    HTTP server (PowerShell HttpListener)
+│   │
+│   └── Demo/                       # 🎭 Demo mode
+│       └── DemoDataGenerator.ps1   #    Generates realistic sample data
+│
+├── Web/                            # 🖥️  Browser-based frontend
+│   ├── index.html                  #    Single-page app shell
+│   ├── css/
+│   │   ├── app.css                 #    Core styles & layout
+│   │   └── enhancements.css        #    Extended components & animations
 │   └── js/
-│       ├── api.js
-│       ├── app.js
-│       ├── charts.js
-│       └── ui-helpers.js
-├── Images/                        # Screenshots
-├── Logs/                          # Auto-created
-└── Reports/Generated/             # Auto-created
+│       ├── app.js                  #    App bootstrap & tab routing
+│       ├── app-state.js            #    Shared application state
+│       ├── api.js                  #    Backend API client
+│       ├── analytics.js            #    Analytics tab logic
+│       ├── charts.js               #    Chart rendering (Chart.js)
+│       ├── connection.js           #    Connection tab & auth flow
+│       ├── deep-dives.js           #    Deep dive modal views
+│       ├── export.js               #    CSV/JSON export logic
+│       ├── operations.js           #    Operations tab logic
+│       ├── permissions-matrix.js   #    Permissions matrix view
+│       ├── search.js               #    Global omnibox search (Ctrl+K)
+│       └── ui-helpers.js           #    Shared UI utilities
+│
+├── Images/                         # 📸 Screenshots for documentation
+└── Logs/                           # 📋 Runtime logs (auto-created)
 ```
 
 ---
@@ -233,15 +263,15 @@ SPO-Permissions-Analyzer/
 | "PnP PowerShell module not found" | Run `Install-Prerequisites.ps1` or `Install-Module PnP.PowerShell -Force` |
 | "Connection timeout" | Check network; ensure redirect URI is `http://localhost` |
 | Execution policy error | `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser` |
-| Container auth not working | Check terminal for device code; ensure `SPO_HEADLESS=true` is set |
+| Container auth not working | Check the container terminal for the device code; ensure `SPO_HEADLESS=true` is set |
 
-Check `./Logs/` for detailed error information. Try **Demo Mode** to isolate connection issues.
+Detailed logs live in `./Logs/`. When in doubt, **Demo Mode** is a great way to confirm whether the issue is connection-related or not.
 
 ---
 
 ## Contributing
 
-Contributions welcome! Fork the repo, create a feature branch, and open a pull request.
+Contributions are welcome! Fork the repo, create a feature branch, and open a pull request. Bug reports, ideas, and feedback via [Issues](https://github.com/CreativeAcer/SPO-Permissions-Analyzer/issues) are equally appreciated.
 
 ---
 
