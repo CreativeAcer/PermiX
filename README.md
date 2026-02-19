@@ -1,5 +1,3 @@
-# <img src="Images/permix-icon.svg" height="36" align="center"/> PermiX [![CodeFactor](https://www.codefactor.io/repository/github/creativeacer/spo-permissions-analyzer/badge)](https://www.codefactor.io/repository/github/creativeacer/spo-permissions-analyzer)
-
 <div align="center">
 
 ![SharePoint](https://img.shields.io/badge/SharePoint-Online-0078D4?style=for-the-badge&logo=microsoft-sharepoint&logoColor=white)
@@ -7,6 +5,7 @@
 ![PnP](https://img.shields.io/badge/PnP-PowerShell_3.x-orange?style=for-the-badge)
 ![Container](https://img.shields.io/badge/Container-Podman%20%7C%20Docker-blue?style=for-the-badge&logo=podman&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
+![CodeFactor](https://www.codefactor.io/repository/github/creativeacer/permix/badge)
 
 <p align="center">
   <img src="Images/permix-logo-dark.svg" alt="PermiX" width="420"/>
