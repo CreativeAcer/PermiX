@@ -1,4 +1,4 @@
-# <img src="assets/permix-icon.svg" height="36" align="center"/> PermiX [![CodeFactor](https://www.codefactor.io/repository/github/creativeacer/spo-permissions-analyzer/badge)](https://www.codefactor.io/repository/github/creativeacer/spo-permissions-analyzer)
+# <img src="Images/permix-icon.svg" height="36" align="center"/> PermiX [![CodeFactor](https://www.codefactor.io/repository/github/creativeacer/spo-permissions-analyzer/badge)](https://www.codefactor.io/repository/github/creativeacer/spo-permissions-analyzer)
 
 <div align="center">
 
