@@ -3,7 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SharePoint Permissions Analyzer</title>
+    <title>PermiX — SharePoint Permissions Auditor</title>
+    <link rel="icon" href="../Images/permix-icon.svg">
     <link rel="stylesheet" href="css/app.css">
     <link rel="stylesheet" href="css/enhancements.css">
 </head>
@@ -11,9 +12,12 @@
 
     <!-- Header Bar -->
     <header id="app-header">
-        <div class="header-titles">
-            <h1>SharePoint Online Permissions Tool</h1>
-            <p>Web Interface</p>
+        <div class="header-brand">
+            <img src="../Images/permix-icon.svg" alt="PermiX logo" class="header-logo">
+            <div class="header-titles">
+                <h1>PermiX</h1>
+                <p>SharePoint Permissions Auditor</p>
+            </div>
         </div>
         <div id="global-search-container" class="global-search-container">
             <input type="search" id="global-search-input" class="global-search-input" placeholder="Search sites, users, groups... (Ctrl+K)" autocomplete="off">
@@ -53,7 +57,7 @@
                     <li>Authentication &rarr; Allow public client flows enabled</li>
                 </ul>
             </div>
-            <div id="headless-note" class="info-box hidden" style="border-left-color:#FFC107;background:#FFF8E1">
+            <div id="headless-note" class="info-box info-box--warning hidden">
                 <h3>Container Mode</h3>
                 <p>Running in a container. Live connections use <strong>device code flow</strong>: click Connect, then check the container terminal for the authentication code. Open <code>https://microsoft.com/devicelogin</code> and enter the code to authenticate.</p>
                 <p>Alternatively, set <code>SPO_TENANT_URL</code> and <code>SPO_CLIENT_ID</code> environment variables to auto-connect on startup.</p>
@@ -236,7 +240,7 @@
                 <button id="export-modal-close">X</button>
             </div>
             <div class="modal-body">
-                <p style="margin-bottom: 20px; color: #64748B;">Choose the format for your export:</p>
+                <p class="export-modal-hint">Choose the format for your export:</p>
                 <div class="export-format-options">
                     <button class="export-format-btn" data-format="csv">
                         <span class="format-icon">📊</span>
