@@ -1,24 +1,24 @@
 /* ============================================================
-   UI/UX Enhancements - Security Dashboard Premium Design
+   PermiX UI Enhancements — Dark Design System
    ============================================================ */
 
-/* ----- Enhanced Color System for Security Dashboard ----- */
+/* ----- Enhanced Color System (PermiX Dark Theme) ----- */
 :root {
     /* Security-focused gradients */
     --gradient-security-critical: linear-gradient(135deg, #DC2626 0%, #991B1B 100%);
-    --gradient-security-high: linear-gradient(135deg, #EA580C 0%, #C2410C 100%);
-    --gradient-security-safe: linear-gradient(135deg, #10B981 0%, #059669 100%);
+    --gradient-security-high:     linear-gradient(135deg, #EA580C 0%, #C2410C 100%);
+    --gradient-security-safe:     linear-gradient(135deg, #10B981 0%, #059669 100%);
 
-    /* Glassmorphism */
-    --glass-bg: rgba(255, 255, 255, 0.7);
-    --glass-border: rgba(255, 255, 255, 0.18);
-    --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+    /* Glassmorphism — dark variant */
+    --glass-bg:     rgba(26, 26, 46, 0.75);
+    --glass-border: rgba(99, 102, 241, 0.18);
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
 
     /* Premium shadows with color tint */
-    --shadow-critical: 0 20px 40px -12px rgba(220, 38, 38, 0.25);
-    --shadow-high: 0 20px 40px -12px rgba(234, 88, 12, 0.20);
-    --shadow-success: 0 20px 40px -12px rgba(16, 185, 129, 0.15);
-    --shadow-primary: 0 20px 40px -12px rgba(0, 120, 212, 0.20);
+    --shadow-critical: 0 20px 40px -12px rgba(220, 38, 38, 0.35);
+    --shadow-high:     0 20px 40px -12px rgba(234, 88, 12, 0.30);
+    --shadow-success:  0 20px 40px -12px rgba(16, 185, 129, 0.25);
+    --shadow-primary:  0 20px 40px -12px rgba(99, 102, 241, 0.30);
 
     /* Enhanced transitions */
     --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -27,7 +27,7 @@
 
 /* ----- Enhanced Body & Container ----- */
 body {
-    background: linear-gradient(135deg, #F8FAFC 0%, #E2E8F0 100%);
+    background: var(--color-bg);
     position: relative;
     overflow-x: hidden;
     padding: 0;
@@ -41,7 +41,7 @@ body::before {
     right: -50%;
     width: 100%;
     height: 100%;
-    background: radial-gradient(circle, rgba(0, 120, 212, 0.05) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.06) 0%, transparent 70%);
     pointer-events: none;
     z-index: 0;
 }
@@ -113,9 +113,8 @@ section,
 
 .risk-banner.risk-critical {
     background: linear-gradient(135deg,
-        rgba(220, 38, 38, 0.15) 0%,
-        rgba(255, 255, 255, 0.95) 30%,
-        white 100%
+        rgba(220, 38, 38, 0.18) 0%,
+        var(--color-surface) 60%
     );
     box-shadow: var(--shadow-critical), var(--shadow-lg);
 }
@@ -131,9 +130,8 @@ section,
 
 .risk-banner.risk-high {
     background: linear-gradient(135deg,
-        rgba(234, 88, 12, 0.12) 0%,
-        rgba(255, 255, 255, 0.95) 30%,
-        white 100%
+        rgba(234, 88, 12, 0.15) 0%,
+        var(--color-surface) 60%
     );
     box-shadow: var(--shadow-high), var(--shadow-lg);
 }
@@ -160,9 +158,9 @@ section,
 }
 
 .risk-score-circle {
-    background: white;
-    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.2),
-                inset 0 0 0 2px rgba(0, 120, 212, 0.1);
+    background: var(--color-surface-elevated);
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5),
+                inset 0 0 0 2px rgba(99, 102, 241, 0.2);
     position: relative;
     overflow: hidden;
 }
@@ -199,8 +197,8 @@ section,
 }
 
 .metric-card {
-    background: linear-gradient(135deg, white 0%, #FAFBFC 100%);
-    border: 1px solid rgba(0, 0, 0, 0.06);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
     position: relative;
     overflow: hidden;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -261,34 +259,34 @@ section,
     transition: all 0.1s ease;
 }
 
-/* Metric card color system */
+/* Metric card color system — PermiX dark theme */
 .metric-card.blue {
-    --metric-color: #0078D4;
-    --metric-color-light: rgba(0, 120, 212, 0.08);
+    --metric-color: #6366F1;
+    --metric-color-light: rgba(99, 102, 241, 0.10);
 }
 .metric-card.green {
     --metric-color: #10B981;
-    --metric-color-light: rgba(16, 185, 129, 0.08);
+    --metric-color-light: rgba(16, 185, 129, 0.10);
 }
 .metric-card.orange {
-    --metric-color: #F59E0B;
-    --metric-color-light: rgba(245, 158, 11, 0.08);
+    --metric-color: #F97316;
+    --metric-color-light: rgba(249, 115, 22, 0.10);
 }
 .metric-card.red {
-    --metric-color: #DC2626;
-    --metric-color-light: rgba(220, 38, 38, 0.08);
+    --metric-color: #EF4444;
+    --metric-color-light: rgba(239, 68, 68, 0.10);
 }
 .metric-card.purple {
     --metric-color: #A855F7;
-    --metric-color-light: rgba(168, 85, 247, 0.08);
+    --metric-color-light: rgba(168, 85, 247, 0.10);
 }
 .metric-card.amber {
-    --metric-color: #F97316;
-    --metric-color-light: rgba(249, 115, 22, 0.08);
+    --metric-color: #F59E0B;
+    --metric-color-light: rgba(245, 158, 11, 0.10);
 }
 .metric-card.crimson {
-    --metric-color: #EA580C;
-    --metric-color-light: rgba(234, 88, 12, 0.08);
+    --metric-color: #F43F5E;
+    --metric-color-light: rgba(244, 63, 94, 0.10);
 }
 
 /* Modern metric label styling */
@@ -297,7 +295,7 @@ section,
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.8px;
-    color: #64748B;
+    color: var(--color-text-secondary);
     order: 1;
     margin: 0;
     transition: color 0.2s ease;
@@ -312,7 +310,7 @@ section,
     font-weight: 700;
     font-size: 2.5rem;
     line-height: 1;
-    color: #1E293B;
+    color: var(--color-text-primary);
     order: 2;
     margin: 0;
     transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -358,9 +356,9 @@ section,
 
 /* ----- Enhanced Buttons with Glow Effect ----- */
 .btn-primary {
-    background: var(--gradient-security-safe);
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
     border: none;
-    box-shadow: 0 4px 14px 0 rgba(16, 185, 129, 0.39);
+    box-shadow: 0 4px 14px 0 rgba(99, 102, 241, 0.35);
     position: relative;
     overflow: hidden;
     transition: var(--transition-smooth);
@@ -373,7 +371,7 @@ section,
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
     transition: left 0.5s;
 }
 
@@ -383,7 +381,7 @@ section,
 
 .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px 0 rgba(16, 185, 129, 0.5);
+    box-shadow: var(--shadow-glow);
 }
 
 .btn-primary:active {
@@ -392,7 +390,7 @@ section,
 
 /* ----- Enhanced Tables with Better Hierarchy ----- */
 .table-enhanced {
-    background: white;
+    background: var(--color-surface);
     border-radius: 16px;
     overflow: hidden;
     box-shadow: var(--shadow-md);
@@ -402,7 +400,7 @@ section,
 }
 
 .table-enhanced thead {
-    background: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%);
+    background: var(--color-surface-elevated);
     position: relative;
 }
 
@@ -410,7 +408,7 @@ section,
     padding: 16px 20px !important;
     font-weight: 600;
     text-align: left;
-    border-bottom: 2px solid rgba(0, 120, 212, 0.1);
+    border-bottom: 2px solid rgba(99, 102, 241, 0.15);
 }
 
 .table-enhanced thead::after {
@@ -429,7 +427,7 @@ section,
 .table-enhanced tbody tr {
     transition: var(--transition-smooth);
     position: relative;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid var(--color-border-subtle);
 }
 
 .table-enhanced tbody tr:last-child {
@@ -458,14 +456,14 @@ section,
 
 .table-enhanced tbody tr:hover {
     background: linear-gradient(90deg,
-        rgba(0, 120, 212, 0.05) 0%,
+        rgba(99, 102, 241, 0.08) 0%,
         transparent 100%);
     transform: translateX(4px);
 }
 
 /* ----- Enhanced Charts Container ----- */
 .chart-container {
-    background: white;
+    background: var(--color-surface);
     border-radius: 16px;
     padding: 24px;
     box-shadow: var(--shadow-md);
@@ -580,9 +578,9 @@ section,
 .skeleton {
     background: linear-gradient(
         90deg,
-        #F1F5F9 0%,
-        #E2E8F0 50%,
-        #F1F5F9 100%
+        #1A1A2E 0%,
+        #22223A 50%,
+        #1A1A2E 100%
     );
     background-size: 200% 100%;
     animation: shimmer 1.5s ease-in-out infinite;
@@ -692,10 +690,10 @@ section,
 
 /* ----- Enhanced Deep Dive Modals ----- */
 .dd-stats {
-    background: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%);
+    background: var(--color-surface-elevated);
     border-radius: 16px;
     padding: 24px;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
     margin-bottom: 24px;
 }
 
@@ -715,7 +713,7 @@ section,
 .dd-stat-value {
     font-weight: 800;
     font-size: 2rem;
-    background: linear-gradient(135deg, var(--primary-700) 0%, var(--primary-500) 100%);
+    background: linear-gradient(135deg, var(--color-gradient-start) 0%, var(--color-gradient-end) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -746,8 +744,8 @@ input:focus,
 textarea:focus,
 select:focus {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(0, 120, 212, 0.1),
-                0 0 20px rgba(0, 120, 212, 0.2);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15),
+                0 0 20px rgba(99, 102, 241, 0.15);
     transform: translateY(-1px);
 }
 
@@ -755,17 +753,17 @@ select:focus {
 .loading-overlay {
     backdrop-filter: blur(8px) saturate(180%);
     -webkit-backdrop-filter: blur(8px) saturate(180%);
-    background: rgba(255, 255, 255, 0.85);
+    background: rgba(15, 15, 26, 0.88);
 }
 
 .loading-spinner {
     width: 64px;
     height: 64px;
-    border: 4px solid rgba(0, 120, 212, 0.1);
+    border: 4px solid rgba(99, 102, 241, 0.15);
     border-top: 4px solid var(--primary-500);
     border-radius: 50%;
     animation: spin 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
-    box-shadow: 0 0 20px rgba(0, 120, 212, 0.3);
+    box-shadow: var(--shadow-glow);
 }
 
 @keyframes spin {
@@ -793,7 +791,7 @@ select:focus {
 
 ::-webkit-scrollbar-thumb:hover {
     background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-700) 100%);
-    box-shadow: 0 0 10px rgba(0, 120, 212, 0.5);
+    box-shadow: 0 0 10px rgba(99, 102, 241, 0.4);
 }
 
 /* ----- Premium Layout Enhancements ----- */
@@ -802,15 +800,15 @@ select:focus {
 #app-header {
     padding: 20px !important;
     margin-bottom: 0 !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4) !important;
 }
 
 /* Tab navigation spacing */
 .tabs {
     padding: 0 20px !important;
     margin-bottom: 0 !important;
-    background: white;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    background: var(--color-surface);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .tab-btn {
@@ -822,7 +820,7 @@ select:focus {
 /* Enhanced sections with proper spacing */
 .analytics-section,
 .operations-section {
-    background: white;
+    background: var(--color-surface);
     border-radius: 12px;
     padding: 20px;
     margin: 16px 0;
@@ -841,7 +839,7 @@ select:focus {
 .table-container {
     margin: 16px 0;
     padding: 20px;
-    background: white;
+    background: var(--color-surface);
     border-radius: 12px;
     box-shadow: var(--shadow-sm);
 }
@@ -862,7 +860,7 @@ select:focus {
 
 .modal-header {
     padding: 20px 24px !important;
-    border-bottom: 2px solid rgba(0, 120, 212, 0.1);
+    border-bottom: 2px solid rgba(99, 102, 241, 0.2);
 }
 
 /* Form spacing */
@@ -1002,33 +1000,34 @@ select:focus {
 .global-search-input {
     width: 100%;
     padding: 10px 16px;
-    border: 1px solid rgba(0, 0, 0, 0.12);
+    border: 1px solid var(--color-border);
     border-radius: 24px;
-    background: white;
+    background: var(--color-surface-elevated);
+    color: var(--color-text-primary);
     font-size: 0.9rem;
     transition: all 0.2s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .global-search-input:focus {
     outline: none;
-    border-color: #0078D4;
-    box-shadow: 0 4px 12px rgba(0, 120, 212, 0.15);
+    border-color: var(--color-primary);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
 }
 
 .global-search-input::placeholder {
-    color: #94A3B8;
+    color: var(--color-text-muted);
     font-size: 0.85rem;
 }
 
 .global-search-input:disabled {
-    background: #F8FAFC;
+    background: var(--color-surface);
     cursor: not-allowed;
     opacity: 0.6;
 }
 
 .global-search-input:disabled::placeholder {
-    color: #CBD5E1;
+    color: var(--color-text-muted);
 }
 
 .global-search-results {
@@ -1038,9 +1037,10 @@ select:focus {
     right: 0;
     max-height: 500px;
     overflow-y: auto;
-    background: white;
+    background: var(--color-surface-elevated);
+    border: 1px solid var(--color-border);
     border-radius: 12px;
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
     z-index: 1000;
     padding: 8px 0;
 }
@@ -1052,7 +1052,7 @@ select:focus {
 .search-no-results {
     padding: 32px 24px;
     text-align: center;
-    color: #64748B;
+    color: var(--color-text-secondary);
     font-size: 0.9rem;
 }
 
@@ -1061,7 +1061,7 @@ select:focus {
 }
 
 .search-result-group:not(:last-child) {
-    border-bottom: 1px solid #F1F5F9;
+    border-bottom: 1px solid var(--color-border-subtle);
 }
 
 .search-result-group-title {
@@ -1070,7 +1070,7 @@ select:focus {
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.8px;
-    color: #64748B;
+    color: var(--color-text-muted);
     display: flex;
     align-items: center;
     gap: 8px;
@@ -1084,25 +1084,25 @@ select:focus {
 }
 
 .search-result-item:hover {
-    background: linear-gradient(90deg, rgba(0, 120, 212, 0.05) 0%, transparent 100%);
-    border-left-color: #0078D4;
+    background: linear-gradient(90deg, rgba(99, 102, 241, 0.08) 0%, transparent 100%);
+    border-left-color: var(--color-primary);
 }
 
 .search-result-item.selected {
-    background: linear-gradient(90deg, rgba(0, 120, 212, 0.1) 0%, transparent 100%);
-    border-left-color: #0078D4;
+    background: linear-gradient(90deg, rgba(99, 102, 241, 0.12) 0%, transparent 100%);
+    border-left-color: var(--color-primary);
 }
 
 .search-result-primary {
     font-size: 0.9rem;
     font-weight: 500;
-    color: #1E293B;
+    color: var(--color-text-primary);
     margin-bottom: 4px;
 }
 
 .search-result-secondary {
     font-size: 0.8rem;
-    color: #64748B;
+    color: var(--color-text-secondary);
 }
 
 /* Scrollbar for search results */
@@ -1111,16 +1111,16 @@ select:focus {
 }
 
 .global-search-results::-webkit-scrollbar-track {
-    background: #F8FAFC;
+    background: var(--color-surface);
 }
 
 .global-search-results::-webkit-scrollbar-thumb {
-    background: #CBD5E1;
+    background: var(--color-border);
     border-radius: 4px;
 }
 
 .global-search-results::-webkit-scrollbar-thumb:hover {
-    background: #94A3B8;
+    background: var(--color-text-muted);
 }
 
 /* Mobile responsiveness */
@@ -1153,7 +1153,7 @@ select:focus {
 /* ----- Tree Visualization Styles ----- */
 .tree-view {
     padding: 20px;
-    background: #FAFBFC;
+    background: var(--color-surface);
     border-radius: 12px;
     max-height: 600px;
     overflow-y: auto;
@@ -1165,9 +1165,9 @@ select:focus {
 }
 
 .tree-node-site {
-    background: white;
+    background: var(--color-surface-elevated);
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
     padding: 4px;
     margin-bottom: 16px;
 }
@@ -1185,11 +1185,11 @@ select:focus {
 .tree-node-site > .tree-node-header {
     font-weight: 600;
     font-size: 1rem;
-    background: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%);
+    background: linear-gradient(135deg, var(--color-surface-elevated) 0%, rgba(99,102,241,0.08) 100%);
 }
 
 .tree-node-site > .tree-node-header:hover {
-    background: linear-gradient(135deg, #E2E8F0 0%, #CBD5E1 100%);
+    background: linear-gradient(135deg, rgba(99,102,241,0.12) 0%, rgba(99,102,241,0.06) 100%);
 }
 
 .tree-node-child > .tree-node-header {
@@ -1197,14 +1197,14 @@ select:focus {
 }
 
 .tree-node-child > .tree-node-header:hover {
-    background: rgba(0, 120, 212, 0.05);
+    background: rgba(99, 102, 241, 0.08);
 }
 
 .tree-expand-icon {
     width: 20px;
     text-align: center;
     font-size: 12px;
-    color: #64748B;
+    color: var(--color-text-muted);
     flex-shrink: 0;
     user-select: none;
 }
@@ -1221,13 +1221,13 @@ select:focus {
 .tree-node-title {
     flex: 1;
     font-weight: 500;
-    color: #1E293B;
+    color: var(--color-text-primary);
 }
 
 .tree-node-type {
     font-size: 0.75rem;
-    color: #64748B;
-    background: #F1F5F9;
+    color: var(--color-text-secondary);
+    background: var(--color-surface-elevated);
     padding: 2px 8px;
     border-radius: 4px;
 }
@@ -1253,15 +1253,15 @@ select:focus {
 
 .tree-node-count {
     font-size: 0.75rem;
-    color: #64748B;
-    background: #F8FAFC;
+    color: var(--color-text-secondary);
+    background: var(--color-surface);
     padding: 2px 8px;
     border-radius: 4px;
 }
 
 .tree-node-children {
     padding-left: 40px;
-    border-left: 2px solid #E2E8F0;
+    border-left: 2px solid var(--color-border);
     margin-left: 20px;
     margin-top: 8px;
 }
@@ -1277,7 +1277,7 @@ select:focus {
     top: 50%;
     width: 30px;
     height: 2px;
-    background: #E2E8F0;
+    background: var(--color-border);
 }
 
 /* Highlight broken vs inheriting nodes */
@@ -1303,17 +1303,17 @@ select:focus {
 }
 
 .tree-view::-webkit-scrollbar-track {
-    background: #F1F5F9;
+    background: var(--color-surface);
     border-radius: 10px;
 }
 
 .tree-view::-webkit-scrollbar-thumb {
-    background: #CBD5E1;
+    background: var(--color-border);
     border-radius: 10px;
 }
 
 .tree-view::-webkit-scrollbar-thumb:hover {
-    background: #94A3B8;
+    background: var(--color-text-muted);
 }
 
 /* ----- Export Format Modal ----- */
@@ -1330,18 +1330,19 @@ select:focus {
     align-items: center;
     gap: 8px;
     padding: 24px 20px;
-    border: 2px solid #E2E8F0;
+    border: 2px solid var(--color-border);
     border-radius: 12px;
-    background: white;
+    background: var(--color-surface-elevated);
+    color: var(--color-text-primary);
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .export-format-btn:hover {
-    border-color: #0078D4;
-    background: linear-gradient(135deg, rgba(0, 120, 212, 0.05) 0%, transparent 100%);
+    border-color: var(--color-primary);
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, transparent 100%);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 120, 212, 0.15);
+    box-shadow: var(--shadow-glow);
 }
 
 .export-format-btn:active {
@@ -1356,12 +1357,12 @@ select:focus {
 .format-name {
     font-size: 1.1rem;
     font-weight: 600;
-    color: #1E293B;
+    color: var(--color-text-primary);
 }
 
 .format-desc {
     font-size: 0.8rem;
-    color: #64748B;
+    color: var(--color-text-secondary);
 }
 
 /* ----- Print Styles ----- */
@@ -1400,18 +1401,19 @@ select:focus {
     align-items: center;
     gap: 12px;
     padding: 32px 24px;
-    border: 2px solid #E2E8F0;
+    border: 2px solid var(--color-border);
     border-radius: 12px;
-    background: white;
+    background: var(--color-surface-elevated);
+    color: var(--color-text-primary);
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .scan-type-btn:hover {
-    border-color: #0078D4;
-    background: linear-gradient(135deg, rgba(0, 120, 212, 0.05) 0%, transparent 100%);
+    border-color: var(--color-primary);
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, transparent 100%);
     transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(0, 120, 212, 0.15);
+    box-shadow: var(--shadow-glow);
 }
 
 .scan-icon {
@@ -1421,17 +1423,17 @@ select:focus {
 .scan-name {
     font-size: 1.2rem;
     font-weight: 600;
-    color: #1E293B;
+    color: var(--color-text-primary);
 }
 
 .scan-desc {
     font-size: 0.9rem;
-    color: #64748B;
+    color: var(--color-text-secondary);
 }
 
 .scan-time {
     font-size: 0.8rem;
-    color: #94A3B8;
+    color: var(--color-text-muted);
     font-style: italic;
 }
 
@@ -1450,14 +1452,14 @@ select:focus {
 .matrix-toolbar {
     margin-bottom: 16px;
     padding: 12px;
-    background: #F8FAFC;
+    background: var(--color-surface-elevated);
     border-radius: 8px;
 }
 
 .matrix-tree-container {
     max-height: 600px;
     overflow-y: auto;
-    background: #FAFBFC;
+    background: var(--color-surface);
     border-radius: 8px;
     padding: 16px;
 }
@@ -1477,18 +1479,18 @@ select:focus {
 }
 
 .matrix-node-header:hover {
-    background: rgba(0, 120, 212, 0.05);
+    background: rgba(99, 102, 241, 0.08);
 }
 
 .matrix-node-title {
     font-weight: 500;
-    color: #1E293B;
+    color: var(--color-text-primary);
 }
 
 .matrix-node-type {
     font-size: 0.75rem;
-    color: #64748B;
-    background: #F1F5F9;
+    color: var(--color-text-secondary);
+    background: var(--color-surface-elevated);
     padding: 2px 8px;
     border-radius: 4px;
 }
@@ -1497,8 +1499,8 @@ select:focus {
     font-size: 0.75rem;
     padding: 4px 8px;
     border-radius: 12px;
-    background: rgba(0, 120, 212, 0.1);
-    color: #0078D4;
+    background: rgba(99, 102, 241, 0.12);
+    color: var(--color-primary-light);
     margin-left: 4px;
 }
 
@@ -1516,8 +1518,8 @@ select:focus {
     margin: 0 auto 20px;
     width: 50px;
     height: 50px;
-    border: 4px solid #F3F4F6;
-    border-top-color: #0078D4;
+    border: 4px solid rgba(99, 102, 241, 0.15);
+    border-top-color: var(--color-primary);
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
