@@ -247,6 +247,7 @@ function renderPermissionChart(users, groups) {
                         padding: 12,
                         usePointStyle: true,
                         pointStyle: 'circle',
+                        color: '#94A3B8',
                         font: {
                             size: 12,
                             weight: '500'
@@ -261,6 +262,7 @@ function renderPermissionChart(users, groups) {
                                     return {
                                         text: `${label} (${percentage}%)`,
                                         fillStyle: data.datasets[0].backgroundColor[i],
+                                        color: '#94A3B8',
                                         hidden: false,
                                         index: i
                                     };
@@ -402,6 +404,7 @@ function renderDeepDiveChart(canvasId, type, data) {
                             padding: 12,
                             usePointStyle: true,
                             pointStyle: 'circle',
+                            color: '#94A3B8',
                             font: {
                                 size: 12,
                                 weight: '500'
@@ -416,6 +419,7 @@ function renderDeepDiveChart(canvasId, type, data) {
                                         return {
                                             text: `${label} (${percentage}%)`,
                                             fillStyle: data.datasets[0].backgroundColor[i],
+                                            color: '#94A3B8',
                                             hidden: false,
                                             index: i
                                         };
