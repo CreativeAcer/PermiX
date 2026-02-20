@@ -34,14 +34,16 @@ function Get-SitePermissionsMatrix {
             title = $site.Title
             type = 'Site'
             url = $site.Url
-            permissions = @()
-            children = @()
+            permissions = [System.Collections.ArrayList]::new()
+            children = [System.Collections.ArrayList]::new()
         }
 
         # Get site role assignments
-        $siteRoles = Get-PnPRoleAssignment -ErrorAction SilentlyContinue
+        # Get-PnPRoleAssignment does not exist in PnP.PowerShell 3.x; use Get-PnPProperty instead.
+        $siteRoles = Get-PnPProperty -ClientObject $site -Property RoleAssignments -ErrorAction SilentlyContinue
         if ($siteRoles) {
             foreach ($role in $siteRoles) {
+                Get-PnPProperty -ClientObject $role -Property Member, RoleDefinitionBindings -ErrorAction SilentlyContinue
                 $principal = $role.Member.Title
                 $roleBinding = $role.RoleDefinitionBindings[0].Name
 
@@ -56,23 +58,26 @@ function Get-SitePermissionsMatrix {
         $totalItems++
 
         # Get lists/libraries
-        $lists = Get-PnPList | Where-Object { -not $_.Hidden -and $_.ItemCount -gt 0 }
+        # -Includes ensures HasUniqueRoleAssignments is loaded; accessing an unloaded CSOM
+        # property throws PropertyOrFieldNotInitializedException which silently empties children.
+        $lists = Get-PnPList -Includes HasUniqueRoleAssignments | Where-Object { -not $_.Hidden -and $_.ItemCount -gt 0 }
 
         foreach ($list in $lists) {
             $listNode = @{
                 title = $list.Title
                 type = if ($list.BaseTemplate -eq 101) { 'Library' } else { 'List' }
                 url = "$($site.Url)/$($list.RootFolder.ServerRelativeUrl)"
-                permissions = @()
-                children = @()
+                permissions = [System.Collections.ArrayList]::new()
+                children = [System.Collections.ArrayList]::new()
             }
 
             # Check list permissions
             if ($list.HasUniqueRoleAssignments) {
                 try {
-                    $listRoles = Get-PnPRoleAssignment -List $list.Title -ErrorAction SilentlyContinue
+                    $listRoles = Get-PnPProperty -ClientObject $list -Property RoleAssignments -ErrorAction SilentlyContinue
                     if ($listRoles) {
                         foreach ($role in $listRoles) {
+                            Get-PnPProperty -ClientObject $role -Property Member, RoleDefinitionBindings -ErrorAction SilentlyContinue
                             $principal = $role.Member.Title
                             $roleBinding = $role.RoleDefinitionBindings[0].Name
 
@@ -94,7 +99,8 @@ function Get-SitePermissionsMatrix {
             if ($ScanType -eq 'full' -or ($ScanType -eq 'quick' -and $list.HasUniqueRoleAssignments)) {
                 try {
                     # Get all items in the list
-                    $items = Get-PnPListItem -List $list.Title -PageSize 500 -ErrorAction SilentlyContinue
+                    # -Includes loads HasUniqueRoleAssignments so the hierarchy check doesn't throw.
+                    $items = Get-PnPListItem -List $list.Title -PageSize 500 -Includes "HasUniqueRoleAssignments" -ErrorAction SilentlyContinue
 
                     foreach ($item in $items) {
                         # Skip if quick scan and item inherits permissions
