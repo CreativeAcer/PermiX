@@ -39,9 +39,11 @@ function Get-SitePermissionsMatrix {
         }
 
         # Get site role assignments
-        $siteRoles = Get-PnPRoleAssignment -ErrorAction SilentlyContinue
+        # Get-PnPRoleAssignment does not exist in PnP.PowerShell 3.x; use Get-PnPProperty instead.
+        $siteRoles = Get-PnPProperty -ClientObject $site -Property RoleAssignments -ErrorAction SilentlyContinue
         if ($siteRoles) {
             foreach ($role in $siteRoles) {
+                Get-PnPProperty -ClientObject $role -Property Member, RoleDefinitionBindings -ErrorAction SilentlyContinue
                 $principal = $role.Member.Title
                 $roleBinding = $role.RoleDefinitionBindings[0].Name
 
@@ -70,9 +72,10 @@ function Get-SitePermissionsMatrix {
             # Check list permissions
             if ($list.HasUniqueRoleAssignments) {
                 try {
-                    $listRoles = Get-PnPRoleAssignment -List $list.Title -ErrorAction SilentlyContinue
+                    $listRoles = Get-PnPProperty -ClientObject $list -Property RoleAssignments -ErrorAction SilentlyContinue
                     if ($listRoles) {
                         foreach ($role in $listRoles) {
+                            Get-PnPProperty -ClientObject $role -Property Member, RoleDefinitionBindings -ErrorAction SilentlyContinue
                             $principal = $role.Member.Title
                             $roleBinding = $role.RoleDefinitionBindings[0].Name
 

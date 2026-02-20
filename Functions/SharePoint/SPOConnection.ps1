@@ -36,7 +36,7 @@
     
     # Method 3: Check if key commands are available (modern commands)
     try {
-        $modernCommands = @("Connect-PnPOnline", "Get-PnPWeb", "Get-PnPRoleAssignment")
+        $modernCommands = @("Connect-PnPOnline", "Get-PnPWeb", "Get-PnPProperty")
         $availableCommands = 0
         
         foreach ($cmd in $modernCommands) {
@@ -127,7 +127,7 @@ function Install-PnPModule {
         }
         
         # Test key modern commands
-        $modernCommands = @("Connect-PnPOnline", "Get-PnPWeb", "Get-PnPRoleAssignment", "Get-PnPUser", "Get-PnPGroup")
+        $modernCommands = @("Connect-PnPOnline", "Get-PnPWeb", "Get-PnPProperty", "Get-PnPUser", "Get-PnPGroup")
         $missingCommands = @()
         
         foreach ($cmd in $modernCommands) {
