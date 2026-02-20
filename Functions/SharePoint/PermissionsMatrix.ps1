@@ -34,8 +34,8 @@ function Get-SitePermissionsMatrix {
             title = $site.Title
             type = 'Site'
             url = $site.Url
-            permissions = @()
-            children = @()
+            permissions = [System.Collections.ArrayList]::new()
+            children = [System.Collections.ArrayList]::new()
         }
 
         # Get site role assignments
@@ -65,8 +65,8 @@ function Get-SitePermissionsMatrix {
                 title = $list.Title
                 type = if ($list.BaseTemplate -eq 101) { 'Library' } else { 'List' }
                 url = "$($site.Url)/$($list.RootFolder.ServerRelativeUrl)"
-                permissions = @()
-                children = @()
+                permissions = [System.Collections.ArrayList]::new()
+                children = [System.Collections.ArrayList]::new()
             }
 
             # Check list permissions
