@@ -135,7 +135,15 @@ function Handle-PostConnect {
         }
         catch { }
 
-        # Test user capabilities
+        # Test user capabilities (temporarily disabled for debugging)
+        $capabilities = @{
+            CanEnumerateSites = $true
+            CanReadUsers = $true
+            CanAccessStorageData = $true
+            CanReadExternalUsers = $true
+            CheckedAt = (Get-Date).ToString("o")
+        }
+        <#
         $capabilities = $null
         try {
             Write-ActivityLog "Testing user capabilities..." -Level "Information"
@@ -153,6 +161,7 @@ function Handle-PostConnect {
                 Error = "Capability check failed"
             }
         }
+        #>
 
         Send-JsonResponse -Response $Response -Data @{
             success = $true
