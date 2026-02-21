@@ -127,16 +127,21 @@ function Handle-PostConnect {
             }
             Write-Host ""
             Write-Host "  Initiating authentication..." -ForegroundColor Yellow
+            Write-Host "  (The device code will appear below)" -ForegroundColor Yellow
             Write-Host ""
 
-            # Disable clipboard to prevent xsel errors on Linux
-            $env:DOTNET_SYSTEM_GLOBALIZATION_INVARIANT = 1
+            # Force interactive output by redirecting all streams and flushing
+            $originalOutput = [Console]::Out
 
-            # Suppress warnings and connect
-            if ($tenantName) {
-                Connect-PnPOnline -Url $body.tenantUrl -ClientId $body.clientId -Tenant $tenantName -DeviceLogin -WarningAction SilentlyContinue
-            } else {
-                Connect-PnPOnline -Url $body.tenantUrl -ClientId $body.clientId -DeviceLogin -WarningAction SilentlyContinue
+            try {
+                if ($tenantName) {
+                    Connect-PnPOnline -Url $body.tenantUrl -ClientId $body.clientId -Tenant $tenantName -DeviceLogin *>&1 | Out-Host
+                } else {
+                    Connect-PnPOnline -Url $body.tenantUrl -ClientId $body.clientId -DeviceLogin *>&1 | Out-Host
+                }
+            }
+            finally {
+                [Console]::Out.Flush()
             }
 
             Write-Host ""
