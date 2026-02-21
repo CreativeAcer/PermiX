@@ -106,6 +106,13 @@ function Handle-PostConnect {
         # Attempt connection
         Write-ActivityLog "Web UI connecting to: $($body.tenantUrl)" -Level "Information"
 
+        # Extract tenant name from URL for authentication
+        # e.g., https://contoso.sharepoint.com -> contoso.onmicrosoft.com
+        $tenantName = $null
+        if ($body.tenantUrl -match '//([^\.]+)\.sharepoint\.com') {
+            $tenantName = "$($matches[1]).onmicrosoft.com"
+        }
+
         if ($env:SPO_HEADLESS) {
             # Container/headless mode: use device code flow
             # The device code appears in the container terminal (podman logs / docker logs)
@@ -113,11 +120,19 @@ function Handle-PostConnect {
             Write-Host "  Device code authentication requested from Web UI" -ForegroundColor Yellow
             Write-Host "  Tenant: $($body.tenantUrl)" -ForegroundColor White
             Write-Host ""
-            Connect-PnPOnline -Url $body.tenantUrl -ClientId $body.clientId -DeviceLogin
+            if ($tenantName) {
+                Connect-PnPOnline -Url $body.tenantUrl -ClientId $body.clientId -Tenant $tenantName -DeviceLogin
+            } else {
+                Connect-PnPOnline -Url $body.tenantUrl -ClientId $body.clientId -DeviceLogin
+            }
         }
         else {
             # Host mode: use interactive browser popup
-            Connect-PnPOnline -Url $body.tenantUrl -ClientId $body.clientId -Interactive
+            if ($tenantName) {
+                Connect-PnPOnline -Url $body.tenantUrl -ClientId $body.clientId -Tenant $tenantName -Interactive
+            } else {
+                Connect-PnPOnline -Url $body.tenantUrl -ClientId $body.clientId -Interactive
+            }
         }
 
         $web = Get-PnPWeb -ErrorAction SilentlyContinue
@@ -135,12 +150,32 @@ function Handle-PostConnect {
         }
         catch { }
 
+        # Test user capabilities
+        $capabilities = $null
+        try {
+            Write-ActivityLog "Testing user capabilities..." -Level "Information"
+            $capabilities = Test-UserCapabilities
+        }
+        catch {
+            Write-ActivityLog "Capability check failed: $($_.Exception.Message)" -Level "Warning"
+            # Return safe defaults if capability check fails
+            $capabilities = @{
+                CanEnumerateSites = $false
+                CanReadUsers = $false
+                CanAccessStorageData = $false
+                CanReadExternalUsers = $false
+                CheckedAt = (Get-Date).ToString("o")
+                Error = "Capability check failed"
+            }
+        }
+
         Send-JsonResponse -Response $Response -Data @{
             success = $true
             message = "Connected to SharePoint Online"
             siteTitle = if ($web) { $web.Title } else { "SharePoint Site" }
             siteUrl = if ($web) { $web.Url } else { $body.tenantUrl }
             user = $currentUser
+            capabilities = $capabilities
         }
     }
     catch {
