@@ -106,33 +106,63 @@ function Handle-PostConnect {
         # Attempt connection
         Write-ActivityLog "Web UI connecting to: $($body.tenantUrl)" -Level "Information"
 
-        # Extract tenant name from URL for authentication
-        # e.g., https://contoso.sharepoint.com -> contoso.onmicrosoft.com
+        # Extract tenant name from URL for DeviceLogin authentication
+        # e.g., https://contoso.sharepoint.com or https://contoso-admin.sharepoint.com -> contoso.onmicrosoft.com
         $tenantName = $null
-        if ($body.tenantUrl -match '//([^\.]+)\.sharepoint\.com') {
+        if ($body.tenantUrl -match '//([^-\.]+)') {
+            # Extract base tenant name (before any hyphens like -admin or -my)
             $tenantName = "$($matches[1]).onmicrosoft.com"
+        }
+
+        # For DeviceLogin (container), use admin URL to enable tenant-wide operations
+        # Interactive mode can auto-switch, but DeviceLogin cannot
+        $connectionUrl = $body.tenantUrl
+        if ($env:SPO_HEADLESS) {
+            # Convert regular tenant URL to admin URL for DeviceLogin
+            if ($connectionUrl -notmatch '-admin\.sharepoint\.com') {
+                $connectionUrl = $connectionUrl -replace '(https://[^\.]+)\.sharepoint\.com', '$1-admin.sharepoint.com'
+                Write-ActivityLog "Using admin URL for DeviceLogin: $connectionUrl" -Level "Information"
+            }
         }
 
         if ($env:SPO_HEADLESS) {
             # Container/headless mode: use device code flow
-            # The device code appears in the container terminal (podman logs / docker logs)
             Write-Host ""
-            Write-Host "  Device code authentication requested from Web UI" -ForegroundColor Yellow
-            Write-Host "  Tenant: $($body.tenantUrl)" -ForegroundColor White
-            Write-Host ""
+            Write-Host "========================================" -ForegroundColor Cyan
+            Write-Host "  DEVICE CODE AUTHENTICATION" -ForegroundColor Cyan
+            Write-Host "========================================" -ForegroundColor Cyan
+            Write-Host "  Requested URL: $($body.tenantUrl)" -ForegroundColor White
+            Write-Host "  Connection URL: $connectionUrl" -ForegroundColor Yellow
             if ($tenantName) {
-                Connect-PnPOnline -Url $body.tenantUrl -ClientId $body.clientId -Tenant $tenantName -DeviceLogin
-            } else {
-                Connect-PnPOnline -Url $body.tenantUrl -ClientId $body.clientId -DeviceLogin
+                Write-Host "  Tenant ID: $tenantName" -ForegroundColor White
             }
+            Write-Host ""
+            Write-Host "  Initiating authentication..." -ForegroundColor Yellow
+            Write-Host "  (The device code will appear below)" -ForegroundColor Yellow
+            Write-Host ""
+
+            # Connect and display output
+            try {
+                if ($tenantName) {
+                    Connect-PnPOnline -Url $connectionUrl -ClientId $body.clientId -Tenant $tenantName -DeviceLogin *>&1 | Out-Host
+                } else {
+                    Connect-PnPOnline -Url $connectionUrl -ClientId $body.clientId -DeviceLogin *>&1 | Out-Host
+                }
+            }
+            finally {
+                [Console]::Out.Flush()
+            }
+
+            Write-Host ""
+            Write-Host "========================================" -ForegroundColor Green
+            Write-Host "  AUTHENTICATION COMPLETED" -ForegroundColor Green
+            Write-Host "========================================" -ForegroundColor Green
+            Write-Host ""
         }
         else {
-            # Host mode: use interactive browser popup
-            if ($tenantName) {
-                Connect-PnPOnline -Url $body.tenantUrl -ClientId $body.clientId -Tenant $tenantName -Interactive
-            } else {
-                Connect-PnPOnline -Url $body.tenantUrl -ClientId $body.clientId -Interactive
-            }
+            # Host mode: use interactive browser popup (doesn't need -Tenant parameter)
+            # Interactive mode can auto-switch to admin, so use the original URL
+            Connect-PnPOnline -Url $body.tenantUrl -ClientId $body.clientId -Interactive
         }
 
         $web = Get-PnPWeb -ErrorAction SilentlyContinue
@@ -159,6 +189,7 @@ function Handle-PostConnect {
         catch {
             Write-ActivityLog "Capability check failed: $($_.Exception.Message)" -Level "Warning"
             # Return safe defaults if capability check fails
+            # This ensures connection succeeds even if capability testing fails
             $capabilities = @{
                 CanEnumerateSites = $false
                 CanReadUsers = $false
@@ -605,28 +636,14 @@ function Handle-PostBuildPermissionsMatrix {
             return
         }
 
-        # Live mode - connect to the specific site.
-        # NOTE: Get-PnPAccessToken returns a token scoped to the originally connected resource
-        # (tenant root or admin URL). Passing that token to Connect-PnPOnline for a different
-        # site collection causes a 401 Unauthorized because the audience doesn't match.
-        # Fix: reconnect using the stored clientId so MSAL silently reuses its cached token.
+        # Live mode - connect to the specific site
         try {
             $currentConnection = Get-PnPConnection -ErrorAction SilentlyContinue
-            if (-not $currentConnection) {
-                throw "No active PnP connection"
-            }
-
-            $clientId = Get-AppSetting -SettingName "SharePoint.ClientId"
-            if (-not $clientId) {
-                throw "Client ID not found in settings. Please reconnect."
-            }
-
-            if ($env:SPO_HEADLESS) {
-                # Container/headless: DeviceLogin — MSAL will use cached tokens silently
-                Connect-PnPOnline -Url $siteUrl -ClientId $clientId -DeviceLogin -WarningAction SilentlyContinue
+            if ($currentConnection) {
+                $accessToken = Get-PnPAccessToken
+                Connect-PnPOnline -Url $siteUrl -AccessToken $accessToken -WarningAction SilentlyContinue
             } else {
-                # Host mode: Interactive — MSAL will use cached tokens silently (no browser popup)
-                Connect-PnPOnline -Url $siteUrl -ClientId $clientId -Interactive -WarningAction SilentlyContinue
+                throw "No active PnP connection"
             }
         } catch {
             Send-JsonResponse -Response $Response -Data @{
