@@ -20,36 +20,12 @@ async function handleConnect() {
     if (appState.headless) {
         results.textContent = 'Connecting via device code flow...\n\n'
             + '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n'
-            + '📋 DEVICE CODE AUTHENTICATION\n'
+            + '📋 CHECK TERMINAL FOR DEVICE CODE\n'
             + '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n'
-            + '⏳ Waiting for device code...';
-
-        // Start polling for device code
-        const pollInterval = setInterval(async () => {
-            try {
-                const deviceInfo = await API.getDeviceCode();
-                if (deviceInfo.deviceCode) {
-                    results.textContent = 'Connecting via device code flow...\n\n'
-                        + '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n'
-                        + '📋 DEVICE CODE AUTHENTICATION\n'
-                        + '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n'
-                        + `🔑 Your Device Code: ${deviceInfo.deviceCode}\n\n`
-                        + `1️⃣  Open this URL in your browser:\n`
-                        + `    ${deviceInfo.deviceUrl || 'https://microsoft.com/devicelogin'}\n\n`
-                        + `2️⃣  Enter the code: ${deviceInfo.deviceCode}\n\n`
-                        + '⏳ Waiting for authentication...';
-
-                    if (deviceInfo.authCompleted) {
-                        clearInterval(pollInterval);
-                    }
-                }
-            } catch (e) {
-                // Ignore polling errors
-            }
-        }, 1000);
-
-        // Store interval ID to clear it later
-        window.deviceCodePollInterval = pollInterval;
+            + 'Run: podman logs <container>\n\n'
+            + 'Look for your device code, then visit:\n'
+            + 'https://microsoft.com/devicelogin\n\n'
+            + '⏳ Waiting for authentication...';
     } else {
         results.textContent = 'Connecting to SharePoint Online...\nPlease complete authentication in the popup window.';
     }
@@ -57,12 +33,6 @@ async function handleConnect() {
 
     try {
         const res = await API.connect(tenantUrl, clientId);
-
-        // Clear device code polling
-        if (window.deviceCodePollInterval) {
-            clearInterval(window.deviceCodePollInterval);
-            window.deviceCodePollInterval = null;
-        }
         if (res.success) {
             appState.connected = true;
 
