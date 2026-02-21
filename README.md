@@ -31,6 +31,7 @@ Runs as a **container** (zero local setup) or a **local web server**. No agents,
 
 Best authentication experience — uses browser popups for seamless re-authentication.
 
+**Windows:**
 ```powershell
 git clone https://github.com/CreativeAcer/SPO-Permissions-Analyzer.git
 cd SPO-Permissions-Analyzer
@@ -38,10 +39,25 @@ cd SPO-Permissions-Analyzer
 .\Start-SPOTool-Web.ps1    # opens http://localhost:8080
 ```
 
+**Linux/macOS:**
+```bash
+# Install PowerShell 7+ first (if not already installed)
+# Ubuntu/Debian: wget -q https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb
+#                sudo dpkg -i packages-microsoft-prod.deb && sudo apt update && sudo apt install -y powershell
+# Fedora:        sudo dnf install -y powershell
+# macOS:         brew install powershell
+
+git clone https://github.com/CreativeAcer/SPO-Permissions-Analyzer.git
+cd SPO-Permissions-Analyzer
+pwsh ./Install-Prerequisites.ps1
+pwsh ./Start-SPOTool-Web.ps1    # opens http://localhost:8080
+```
+
 **Why local mode is preferred:**
 - **One-click authentication** — browser popups handle all auth flows automatically
 - **No re-authentication needed** — analyze any site without additional device codes
 - **Seamless UX** — MSAL token cache handles everything in the background
+- **Works on Windows, Linux, and macOS** — PowerShell 7+ is cross-platform
 
 Requires PowerShell 7+ and PnP.PowerShell 3.x (installer handles this).
 
@@ -67,6 +83,15 @@ Use container mode for: server deployments, CI/CD pipelines, or Linux-only envir
 ### Not ready to connect yet?
 
 Hit **Demo Mode** on the Connection tab — it loads realistic sample data so you can explore every feature without a SharePoint connection.
+
+### Platform Support
+
+| Mode | Windows | Linux | macOS |
+|------|---------|-------|-------|
+| **Local Web Server** | ✅ | ✅ | ✅ |
+| **Container** | ✅ | ✅ | ✅ |
+
+Local mode uses PowerShell 7+ (cross-platform) with Interactive authentication (browser popups). Container mode uses device code flow in all environments.
 
 ---
 
