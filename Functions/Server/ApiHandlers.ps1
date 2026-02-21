@@ -118,17 +118,38 @@ function Handle-PostConnect {
             # Container/headless mode: use device code flow
             # The device code appears in the container terminal (podman logs / docker logs)
             Write-Host ""
-            Write-Host "  Device code authentication requested from Web UI" -ForegroundColor Yellow
-            Write-Host "  Tenant: $($body.tenantUrl)" -ForegroundColor White
+            Write-Host "========================================" -ForegroundColor Cyan
+            Write-Host "  DEVICE CODE AUTHENTICATION" -ForegroundColor Cyan
+            Write-Host "========================================" -ForegroundColor Cyan
+            Write-Host "  Tenant URL: $($body.tenantUrl)" -ForegroundColor White
             if ($tenantName) {
                 Write-Host "  Tenant ID: $tenantName" -ForegroundColor White
             }
             Write-Host ""
+            Write-Host "  Waiting for device code..." -ForegroundColor Yellow
+            Write-Host ""
+
+            # Redirect errors to suppress clipboard warnings
             if ($tenantName) {
-                Connect-PnPOnline -Url $body.tenantUrl -ClientId $body.clientId -Tenant $tenantName -DeviceLogin
+                Connect-PnPOnline -Url $body.tenantUrl -ClientId $body.clientId -Tenant $tenantName -DeviceLogin 2>&1 | ForEach-Object {
+                    # Filter out clipboard warnings, show everything else
+                    if ($_ -notmatch 'xsel|clipboard') {
+                        Write-Host $_ -ForegroundColor White
+                    }
+                }
             } else {
-                Connect-PnPOnline -Url $body.tenantUrl -ClientId $body.clientId -DeviceLogin
+                Connect-PnPOnline -Url $body.tenantUrl -ClientId $body.clientId -DeviceLogin 2>&1 | ForEach-Object {
+                    if ($_ -notmatch 'xsel|clipboard') {
+                        Write-Host $_ -ForegroundColor White
+                    }
+                }
             }
+
+            Write-Host ""
+            Write-Host "========================================" -ForegroundColor Green
+            Write-Host "  AUTHENTICATION COMPLETED" -ForegroundColor Green
+            Write-Host "========================================" -ForegroundColor Green
+            Write-Host ""
         }
         else {
             # Host mode: use interactive browser popup (doesn't need -Tenant parameter)
