@@ -317,10 +317,76 @@ function Handle-PostPermissions {
     $script:ServerState.OperationLog.Clear()
     $script:ServerState.OperationError = $null
     $script:ServerState.OperationSiteUrl = $siteUrl
+
+    # Container mode: Pre-authenticate to different sites before background job
+    # (DeviceLogin output won't work from background runspace)
+    if ($env:SPO_HEADLESS -and $siteUrl) {
+        try {
+            $currentUrl = (Get-PnPConnection -ErrorAction SilentlyContinue).Url
+            $currentUrlNorm = if ($currentUrl) { $currentUrl.TrimEnd('/') } else { "" }
+            $targetUrlNorm = $siteUrl.TrimEnd('/')
+
+            # If analyzing a different site, authenticate now in main runspace
+            if ($currentUrlNorm -ne $targetUrlNorm) {
+                [void]$script:ServerState.OperationLog.Add("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+                [void]$script:ServerState.OperationLog.Add("📋 AUTHENTICATION REQUIRED")
+                [void]$script:ServerState.OperationLog.Add("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+                [void]$script:ServerState.OperationLog.Add("")
+                [void]$script:ServerState.OperationLog.Add("Analyzing a different site requires re-authentication.")
+                [void]$script:ServerState.OperationLog.Add("")
+                [void]$script:ServerState.OperationLog.Add("👉 CHECK YOUR TERMINAL FOR DEVICE CODE")
+                [void]$script:ServerState.OperationLog.Add("")
+                [void]$script:ServerState.OperationLog.Add("Run: podman logs <container>")
+                [void]$script:ServerState.OperationLog.Add("")
+                [void]$script:ServerState.OperationLog.Add("Visit: https://microsoft.com/devicelogin")
+                [void]$script:ServerState.OperationLog.Add("")
+                [void]$script:ServerState.OperationLog.Add("⏳ Waiting for authentication...")
+
+                Write-Host ""
+                Write-Host "========================================" -ForegroundColor Cyan
+                Write-Host "  SITE-SPECIFIC AUTHENTICATION" -ForegroundColor Cyan
+                Write-Host "========================================" -ForegroundColor Cyan
+                Write-Host "  Target site: $siteUrl" -ForegroundColor White
+                Write-Host "  Initiating device code authentication..." -ForegroundColor Yellow
+                Write-Host ""
+
+                $clientId = Get-AppSetting -SettingName "SharePoint.ClientId"
+                $tenantName = ""
+                if ($siteUrl -match '//([^-\.]+)') {
+                    $tenantName = "$($matches[1]).onmicrosoft.com"
+                }
+
+                if ($tenantName) {
+                    Connect-PnPOnline -Url $siteUrl -ClientId $clientId -Tenant $tenantName -DeviceLogin *>&1 | Out-Host
+                } else {
+                    Connect-PnPOnline -Url $siteUrl -ClientId $clientId -DeviceLogin *>&1 | Out-Host
+                }
+                [Console]::Out.Flush()
+
+                Write-Host ""
+                Write-Host "  ✓ Authenticated to target site" -ForegroundColor Green
+                Write-Host "========================================" -ForegroundColor Cyan
+                Write-Host ""
+
+                [void]$script:ServerState.OperationLog.Add("")
+                [void]$script:ServerState.OperationLog.Add("✅ Authentication successful!")
+                [void]$script:ServerState.OperationLog.Add("")
+            }
+        }
+        catch {
+            Write-ActivityLog "Pre-authentication failed: $($_.Exception.Message)" -Level "Warning"
+            [void]$script:ServerState.OperationLog.Add("")
+            [void]$script:ServerState.OperationLog.Add("❌ Authentication failed: $($_.Exception.Message)")
+            [void]$script:ServerState.OperationLog.Add("")
+        }
+    }
+
     [void]$script:ServerState.OperationLog.Add("Starting permissions analysis...")
+    Write-ActivityLog "Permissions analysis requested for site: '$siteUrl'" -Level "Information"
 
     Start-BackgroundOperation -ScriptBlock {
         $siteUrl = $SharedState.OperationSiteUrl
+        [void]$SharedState.OperationLog.Add("DEBUG: Background job starting with site URL: '$siteUrl'")
         Get-RealPermissions-DataDriven -SiteUrl $siteUrl
         [void]$SharedState.OperationLog.Add("Analysis complete.")
     }

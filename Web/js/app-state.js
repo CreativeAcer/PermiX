@@ -8,7 +8,8 @@ let appState = {
     demoMode: false,
     dataLoaded: false,
     headless: false,
-    capabilities: {}
+    capabilities: {},
+    connectedSiteUrl: ''
 };
 
 // --- Utilities ---

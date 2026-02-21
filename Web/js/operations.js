@@ -46,13 +46,27 @@ async function handleGetSites() {
 
 async function handleAnalyze() {
     console.log('handleAnalyze called'); // Debug log
-    const siteUrl = document.getElementById('input-site-url').value.trim();
+    const inputSiteUrl = document.getElementById('input-site-url').value.trim();
+    // Use the input site URL if provided, otherwise fall back to the connected site URL
+    const siteUrl = inputSiteUrl || appState.connectedSiteUrl;
     const console_ = document.getElementById('operations-console');
-    console_.textContent = 'Starting permissions analysis...\n';
+
+    console.log('Site URL for analysis:', siteUrl);
+    console.log('Connected site URL:', appState.connectedSiteUrl);
+
+    if (!siteUrl) {
+        console_.textContent = 'Error: No site URL available. Please enter a site URL or reconnect to SharePoint.';
+        toast('No site URL available', 'error');
+        return;
+    }
+
+    console_.textContent = `Starting permissions analysis for: ${siteUrl}\n`;
     setButtonLoading('btn-analyze', true);
 
     try {
+        console.log('Calling API.analyzePermissions with:', siteUrl);
         const res = await API.analyzePermissions(siteUrl);
+        console.log('API.analyzePermissions response:', res);
         if (res.started) {
             // Background operation — poll until complete
             const progress = await pollUntilComplete(console_);

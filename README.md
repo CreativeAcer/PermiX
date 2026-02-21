@@ -27,7 +27,25 @@ Runs as a **container** (zero local setup) or a **local web server**. No agents,
 
 ## Quick Start
 
-### Option A: Container ✅ recommended
+### Option A: Local Web Server ✅ **recommended**
+
+Best authentication experience — uses browser popups for seamless re-authentication.
+
+```powershell
+git clone https://github.com/CreativeAcer/SPO-Permissions-Analyzer.git
+cd SPO-Permissions-Analyzer
+.\Install-Prerequisites.ps1
+.\Start-SPOTool-Web.ps1    # opens http://localhost:8080
+```
+
+**Why local mode is preferred:**
+- **One-click authentication** — browser popups handle all auth flows automatically
+- **No re-authentication needed** — analyze any site without additional device codes
+- **Seamless UX** — MSAL token cache handles everything in the background
+
+Requires PowerShell 7+ and PnP.PowerShell 3.x (installer handles this).
+
+### Option B: Container
 
 Zero local dependencies — just Podman or Docker.
 
@@ -39,16 +57,12 @@ podman compose up        # or: docker compose up
 
 Open `http://localhost:8080` and you're in.
 
-### Option B: Local Web Server
+**Container mode limitations:**
+- **Device code authentication** — requires terminal access to see device codes
+- **Re-authentication per site** — analyzing different sites requires entering a new device code each time
+- **Why?** SharePoint access tokens are scoped per site, and container mode can't use browser popups
 
-Requires PowerShell 7+ and PnP.PowerShell.
-
-```powershell
-git clone https://github.com/CreativeAcer/SPO-Permissions-Analyzer.git
-cd SPO-Permissions-Analyzer
-.\Install-Prerequisites.ps1
-.\Start-SPOTool-Web.ps1    # opens http://localhost:8080
-```
+Use container mode for: server deployments, CI/CD pipelines, or Linux-only environments.
 
 ### Not ready to connect yet?
 
@@ -73,7 +87,7 @@ Hit **Demo Mode** on the Connection tab — it loads realistic sample data so yo
 
 ### Live SharePoint Connection
 
-The container uses **device code flow** for authentication (no browser popup needed).
+The container uses **device code flow** for authentication (no browser popup available in headless environments).
 
 **Auto-connect on startup** — uncomment and set env vars in `compose.yaml`:
 
@@ -86,6 +100,12 @@ environment:
 The device code appears in the container terminal. Open `https://microsoft.com/devicelogin`, enter the code, and the web server starts already connected.
 
 **Connect via the UI** — click "Connect to SharePoint" in the browser. The device code appears in the container terminal (`podman logs <container>`). Authenticate at the device login URL; the UI updates when complete.
+
+**⚠️ Authentication Requirements:**
+- **Initial connection**: Device code required (appears in terminal)
+- **Analyzing different sites**: New device code required for each unique site URL
+- **Why multiple authentications?** SharePoint access tokens are scoped per site collection. Container mode cannot use Interactive auth (browser popups), so it must request new device codes when switching sites.
+- **Workaround**: Analyze the same site you connected to initially, or use local mode for seamless multi-site analysis.
 
 ---
 

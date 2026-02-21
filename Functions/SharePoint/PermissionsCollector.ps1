@@ -18,8 +18,10 @@ function Get-RealPermissions-DataDriven {
     )
 
     try {
+        Write-ConsoleOutput "DEBUG: Get-RealPermissions-DataDriven called with SiteUrl: '$SiteUrl'"
+
         if ([string]::IsNullOrEmpty($SiteUrl)) {
-            Write-ConsoleOutput "No site URL provided. Please specify a site URL to analyze permissions."
+            Write-ConsoleOutput "ERROR: No site URL provided. Please specify a site URL to analyze permissions."
             return
         }
 
@@ -57,7 +59,22 @@ function Get-RealPermissions-DataDriven {
                 Connect-PnPOnline -Url $SiteUrl -AccessToken $token -ErrorAction Stop
             } else {
                 $cid = Get-AppSetting -SettingName "SharePoint.ClientId"
-                Connect-PnPOnline -Url $SiteUrl -ClientId $cid -Interactive
+                if ($env:SPO_HEADLESS) {
+                    # Extract tenant name from site URL
+                    $tenantName = ""
+                    if ($SiteUrl -match '//([^-\.]+)') {
+                        $tenantName = "$($matches[1]).onmicrosoft.com"
+                    }
+                    if ($tenantName) {
+                        Connect-PnPOnline -Url $SiteUrl -ClientId $cid -Tenant $tenantName -DeviceLogin *>&1 | Out-Host
+                        [Console]::Out.Flush()
+                    } else {
+                        Connect-PnPOnline -Url $SiteUrl -ClientId $cid -DeviceLogin *>&1 | Out-Host
+                        [Console]::Out.Flush()
+                    }
+                } else {
+                    Connect-PnPOnline -Url $SiteUrl -ClientId $cid -Interactive
+                }
             }
         }
         Write-ConsoleOutput "Connected successfully!"
@@ -102,7 +119,22 @@ function Get-RealPermissions-DataDriven {
                     Connect-PnPOnline -Url $adminUrl -AccessToken $adminToken -ErrorAction Stop
                 } else {
                     $cid = Get-AppSetting -SettingName "SharePoint.ClientId"
-                    Connect-PnPOnline -Url $adminUrl -ClientId $cid -Interactive -ErrorAction Stop
+                    if ($env:SPO_HEADLESS) {
+                        # Extract tenant name from admin URL
+                        $tenantName = ""
+                        if ($adminUrl -match '//([^-\.]+)') {
+                            $tenantName = "$($matches[1]).onmicrosoft.com"
+                        }
+                        if ($tenantName) {
+                            Connect-PnPOnline -Url $adminUrl -ClientId $cid -Tenant $tenantName -DeviceLogin -ErrorAction Stop *>&1 | Out-Host
+                            [Console]::Out.Flush()
+                        } else {
+                            Connect-PnPOnline -Url $adminUrl -ClientId $cid -DeviceLogin -ErrorAction Stop *>&1 | Out-Host
+                            [Console]::Out.Flush()
+                        }
+                    } else {
+                        Connect-PnPOnline -Url $adminUrl -ClientId $cid -Interactive -ErrorAction Stop
+                    }
                 }
                 $tenantSites = Get-PnPTenantSite -Url $SiteUrl -Detailed -ErrorAction Stop
 
@@ -119,7 +151,22 @@ function Get-RealPermissions-DataDriven {
                     Connect-PnPOnline -Url $SiteUrl -AccessToken $siteToken -ErrorAction Stop
                 } else {
                     $cid = Get-AppSetting -SettingName "SharePoint.ClientId"
-                    Connect-PnPOnline -Url $SiteUrl -ClientId $cid -Interactive
+                    if ($env:SPO_HEADLESS) {
+                        # Extract tenant name from site URL
+                        $tenantName = ""
+                        if ($SiteUrl -match '//([^-\.]+)') {
+                            $tenantName = "$($matches[1]).onmicrosoft.com"
+                        }
+                        if ($tenantName) {
+                            Connect-PnPOnline -Url $SiteUrl -ClientId $cid -Tenant $tenantName -DeviceLogin *>&1 | Out-Host
+                            [Console]::Out.Flush()
+                        } else {
+                            Connect-PnPOnline -Url $SiteUrl -ClientId $cid -DeviceLogin *>&1 | Out-Host
+                            [Console]::Out.Flush()
+                        }
+                    } else {
+                        Connect-PnPOnline -Url $SiteUrl -ClientId $cid -Interactive
+                    }
                 }
             }
             catch {

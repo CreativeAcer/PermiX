@@ -36,7 +36,8 @@ async function handleConnect() {
         if (res.success) {
             appState.connected = true;
 
-            // Store capabilities in app state
+            // Store connection details in app state
+            appState.connectedSiteUrl = res.siteUrl || tenantUrl;
             appState.capabilities = res.capabilities || {};
 
             results.textContent = `Connected successfully!\n\nSite: ${res.siteTitle || 'N/A'}\nURL: ${res.siteUrl || 'N/A'}\nUser: ${res.user || 'N/A'}\n\nYou can now use SharePoint Operations.`;
@@ -75,7 +76,8 @@ async function handleDemo() {
             appState.demoMode = true;
             appState.dataLoaded = true;
 
-            // Demo mode has all capabilities
+            // Demo mode connection details
+            appState.connectedSiteUrl = 'https://contoso.sharepoint.com/sites/demo';
             appState.capabilities = {
                 CanEnumerateSites: true,
                 CanReadUsers: true,

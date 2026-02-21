@@ -92,26 +92,78 @@ function Start-BackgroundOperation {
         if ($connectUrl) {
             $connected = $false
 
-            # Preferred: use -ClientId -Interactive, which leverages MSAL's persistent
-            # token cache from the user's earlier interactive login.  MSAL will silently
-            # acquire a token without showing a browser popup.
-            if ($ClientId) {
-                try {
-                    Connect-PnPOnline -Url $connectUrl -ClientId $ClientId -Interactive -ErrorAction Stop
-                    $connected = $true
-                } catch {
-                    [void]$SharedState.OperationLog.Add("Note: Silent auth failed, trying access token fallback...")
+            if ($env:SPO_HEADLESS) {
+                # CONTAINER MODE: Try access token only for same-site reconnection
+                # For different sites, use DeviceLogin to get proper scoped token
+
+                $tryAccessToken = $false
+                if ($AccessToken -and $TenantUrl) {
+                    # Only use access token if connecting to the same site as initial connection
+                    if ($connectUrl -eq $TenantUrl) {
+                        $tryAccessToken = $true
+                    }
+                }
+
+                if ($tryAccessToken) {
+                    try {
+                        Connect-PnPOnline -Url $connectUrl -AccessToken $AccessToken -ErrorAction Stop
+                        $connected = $true
+                        [void]$SharedState.OperationLog.Add("Connected using access token (same site)")
+                    } catch {
+                        [void]$SharedState.OperationLog.Add("Access token failed, will try DeviceLogin...")
+                    }
+                }
+
+                if (-not $connected -and $ClientId) {
+                    try {
+                        [void]$SharedState.OperationLog.Add("Requesting device code for background connection...")
+
+                        # Extract tenant name from URL
+                        $tenantName = ""
+                        if ($connectUrl -match '//([^-\.]+)') {
+                            $tenantName = "$($matches[1]).onmicrosoft.com"
+                        }
+
+                        if ($tenantName) {
+                            Connect-PnPOnline -Url $connectUrl -ClientId $ClientId -Tenant $tenantName -DeviceLogin -ErrorAction Stop *>&1 | Out-Host
+                            [Console]::Out.Flush()
+                        } else {
+                            Connect-PnPOnline -Url $connectUrl -ClientId $ClientId -DeviceLogin -ErrorAction Stop *>&1 | Out-Host
+                            [Console]::Out.Flush()
+                        }
+                        $connected = $true
+                    } catch {
+                        [void]$SharedState.OperationLog.Add("ERROR: DeviceLogin failed: $($_.Exception.Message)")
+                    }
+                }
+            } else {
+                # LOCAL/WINDOWS MODE: Use Interactive (gets fresh token with right scope)
+                # Don't use access token - it may be scoped for admin site only
+
+                if ($ClientId) {
+                    try {
+                        Connect-PnPOnline -Url $connectUrl -ClientId $ClientId -Interactive -ErrorAction Stop
+                        $connected = $true
+                        [void]$SharedState.OperationLog.Add("Connected using Interactive mode")
+                    } catch {
+                        [void]$SharedState.OperationLog.Add("Interactive connection failed, trying access token fallback...")
+                    }
+                }
+
+                # Fallback to access token only if Interactive fails
+                if (-not $connected -and $AccessToken) {
+                    try {
+                        Connect-PnPOnline -Url $connectUrl -AccessToken $AccessToken -ErrorAction Stop
+                        $connected = $true
+                        [void]$SharedState.OperationLog.Add("Connected using access token fallback")
+                    } catch {
+                        [void]$SharedState.OperationLog.Add("ERROR: All connection methods failed")
+                    }
                 }
             }
 
-            # Fallback: use the forwarded access token string
-            if (-not $connected -and $AccessToken) {
-                try {
-                    Connect-PnPOnline -Url $connectUrl -AccessToken $AccessToken -ErrorAction Stop
-                    $connected = $true
-                } catch {
-                    [void]$SharedState.OperationLog.Add("Warning: Could not re-establish PnP connection in background: $($_.Exception.Message)")
-                }
+            if (-not $connected) {
+                [void]$SharedState.OperationLog.Add("CRITICAL: No valid PnP connection - analysis may return incomplete data")
             }
         }
 
