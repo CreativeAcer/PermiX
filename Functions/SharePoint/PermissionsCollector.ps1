@@ -18,8 +18,6 @@ function Get-RealPermissions-DataDriven {
     )
 
     try {
-        Write-ConsoleOutput "DEBUG: Get-RealPermissions-DataDriven called with SiteUrl: '$SiteUrl'"
-
         if ([string]::IsNullOrEmpty($SiteUrl)) {
             Write-ConsoleOutput "ERROR: No site URL provided. Please specify a site URL to analyze permissions."
             return

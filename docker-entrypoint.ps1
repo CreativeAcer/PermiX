@@ -2,11 +2,11 @@
 .SYNOPSIS
     Container entrypoint - launches web UI
 .DESCRIPTION
-    Starts the web-based SharePoint Permissions Analyzer on port 8080
+    Starts the web-based PermiX on port 8080
 #>
 
 Write-Host ""
-Write-Host "  Starting SharePoint Permissions Analyzer (Web UI)" -ForegroundColor Cyan
+Write-Host "  Starting PermiX (Web UI)" -ForegroundColor Cyan
 Write-Host "  Access the UI at: http://localhost:8080" -ForegroundColor Green
 Write-Host ""
 

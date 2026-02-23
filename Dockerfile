@@ -1,5 +1,5 @@
 # ============================================
-# SPO Permissions Analyzer - Container Image
+# PermiX - Container Image
 # ============================================
 # Web UI on port 8080
 #

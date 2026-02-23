@@ -1,7 +1,7 @@
 ﻿#Requires -Version 7.0
 <#
 .SYNOPSIS
-    Install prerequisites for SharePoint Online Permissions Report Tool (PowerShell 7 + Modern PnP)
+    Install prerequisites for PermiX (PowerShell 7 + Modern PnP)
 .DESCRIPTION
     Updated installer for PowerShell 7 with modern PnP PowerShell 3.x
 #>
@@ -15,7 +15,7 @@ param(
     [switch]$Force = $false
 )
 
-Write-Host "SharePoint Online Permissions Report Tool" -ForegroundColor Green
+Write-Host "PermiX Report Tool" -ForegroundColor Green
 Write-Host "Modern Prerequisites Installer (PowerShell 7 + PnP 3.x)" -ForegroundColor Yellow
 Write-Host "=" * 60 -ForegroundColor Gray
 

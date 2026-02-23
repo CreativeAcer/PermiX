@@ -1,7 +1,7 @@
 #Requires -Version 7.0
 <#
 .SYNOPSIS
-    SharePoint Online Permissions Analyzer - Web UI Version
+    PermiX - Web UI Version
 .DESCRIPTION
     Launches a local web server that serves a browser-based UI.
     The SharePoint/Core backend is identical to the WPF version;
@@ -58,7 +58,7 @@ param(
 # ============================================
 # 6. Initialize and start
 # ============================================
-Write-ActivityLog "=== SharePoint Permissions Analyzer (Web UI) ===" -Level "Information"
+Write-ActivityLog "=== PermiX (Web UI) ===" -Level "Information"
 
 Initialize-SharePointDataManager
 

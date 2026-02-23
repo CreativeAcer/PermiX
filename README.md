@@ -23,6 +23,23 @@ Runs as a **container** (zero local setup) or a **local web server**. No agents,
 
 </div>
 
+# Why PermiX Exists
+
+SharePoint permissions are notoriously hard to understand — even for the people who set them up.
+
+When something goes wrong ("why can't I see this site?", "who gave that external user access?", "did I accidentally share that folder with everyone?"), the usual answer is: *ask your admin*. The admin then has to stop what they're doing, dig through the SharePoint admin center, click through multiple nested permission levels, and try to explain what they found in a way that actually makes sense to the person asking.
+
+## The goal 
+Give site owners, project managers, and security-conscious users the ability to **investigate their own environment confidently** — spot a potential issue, understand what they're looking at, and either fix it themselves or bring a clear, specific question to IT instead of a vague concern.
+
+Less guesswork. Fewer support tickets. More ownership.
+
+That loop is slow, frustrating for everyone, and doesn't scale.
+
+## What PermiX Is Not
+
+PermiX is a **read-only analysis tool**. It makes no changes to your SharePoint environment. It has no backend, stores nothing externally, and runs entirely within your own infrastructure — locally or in a container you control.
+
 ---
 
 ## Quick Start
@@ -33,8 +50,8 @@ Best authentication experience — uses browser popups for seamless re-authentic
 
 **Windows:**
 ```powershell
-git clone https://github.com/CreativeAcer/SPO-Permissions-Analyzer.git
-cd SPO-Permissions-Analyzer
+git clone https://github.com/CreativeAcer/PermiX.git
+cd PermiX
 .\Install-Prerequisites.ps1
 .\Start-SPOTool-Web.ps1    # opens http://localhost:8080
 ```
@@ -47,8 +64,8 @@ cd SPO-Permissions-Analyzer
 # Fedora:        sudo dnf install -y powershell
 # macOS:         brew install powershell
 
-git clone https://github.com/CreativeAcer/SPO-Permissions-Analyzer.git
-cd SPO-Permissions-Analyzer
+git clone https://github.com/CreativeAcer/PermiX.git
+cd PermiX
 pwsh ./Install-Prerequisites.ps1
 pwsh ./Start-SPOTool-Web.ps1    # opens http://localhost:8080
 ```
@@ -66,8 +83,8 @@ Requires PowerShell 7+ and PnP.PowerShell 3.x (installer handles this).
 Zero local dependencies — just Podman or Docker.
 
 ```bash
-git clone https://github.com/CreativeAcer/SPO-Permissions-Analyzer.git
-cd SPO-Permissions-Analyzer
+git clone https://github.com/CreativeAcer/PermiX.git
+cd PermiX
 podman compose up        # or: docker compose up
 ```
 
@@ -218,7 +235,7 @@ You need an Azure AD App Registration to connect to SharePoint Online.
 ### 1. Create the registration
 
 1. **Azure Portal** > **App registrations** > **New registration**
-2. Name: `SharePoint Permissions Analyzer`
+2. Name: `PermiX`
 3. Account types: **Single tenant**
 4. Authentication > **Allow public lcient flows** > `Yes`
 5. Redirect URI: **Public client/native (Web)** > `http://localhost` and `https://login.microsoftonline.com/common/oauth2/nativeclient`
@@ -248,7 +265,7 @@ Click **Grant admin consent** after adding all permissions.
 ## Project Structure
 
 ```
-SPO-Permissions-Analyzer/
+PermiX/
 ├── Start-SPOTool-Web.ps1           # 🚀 Web UI entry point (local mode)
 ├── Dockerfile                      # 🐳 Container image definition
 ├── compose.yaml                    # 📦 Podman/Docker Compose config
@@ -286,6 +303,10 @@ SPO-Permissions-Analyzer/
 │
 ├── Web/                            # 🖥️  Browser-based frontend
 │   ├── index.html                  #    Single-page app shell
+│   ├── Assets/
+│   │   ├── permix-icon.svg         #    Icon for Project
+│   │   ├── permix-logo-light.svg   #    Light social image
+│   │   └── permix-logo-dark.svg    #    Dark social image
 │   ├── css/
 │   │   ├── app.css                 #    Core styles & layout
 │   │   └── enhancements.css        #    Extended components & animations
@@ -325,7 +346,7 @@ Detailed logs live in `./Logs/`. When in doubt, **Demo Mode** is a great way to 
 
 ## Contributing
 
-Contributions are welcome! Fork the repo, create a feature branch, and open a pull request. Bug reports, ideas, and feedback via [Issues](https://github.com/CreativeAcer/SPO-Permissions-Analyzer/issues) are equally appreciated.
+Contributions are welcome! Fork the repo, create a feature branch, and open a pull request. Bug reports, ideas, and feedback via [Issues](https://github.com/CreativeAcer/PermiX/issues) are equally appreciated.
 
 ---
 
@@ -337,7 +358,7 @@ MIT — see [LICENSE](LICENSE).
 
 <div align="center">
 
-**[Report an Issue](https://github.com/CreativeAcer/SPO-Permissions-Analyzer/issues)** | **[Discussions](https://github.com/CreativeAcer/SPO-Permissions-Analyzer/discussions)**
+**[Report an Issue](https://github.com/CreativeAcer/PermiX/issues)** | **[Discussions](https://github.com/CreativeAcer/PermiX/discussions)**
 
 Made with care by [CreativeAcer](https://github.com/CreativeAcer)
 
